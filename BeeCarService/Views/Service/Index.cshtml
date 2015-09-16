@@ -78,7 +78,7 @@
                                             <ul class="cupSizeul clearfix">
                                                 <li class="smallCupSize" for="addons">Add-ons : </li>
                                                 <li ng-repeat="vehAddon in requestData.vehicleService.addons">
-                                                    <input type="checkbox" name="vehAddon_{{$parent.$parent.$index}}_{{$parent.$index}}_{{$index}}" ng-true-value="{{vehAddon}}" ng-model="requestData.vehicleService.vehicleAddons[$index]"></input>
+                                                    <input type="checkbox" name="vehAddon_{{$parent.$parent.$index}}_{{$parent.$index}}_{{$index}}" ng-true-value="{{vehAddon}}" ng-model="requestData.vehicleAddons[$index]"></input>
                                                     {{vehAddon.name}}
                                                 </li>
                                             </ul>

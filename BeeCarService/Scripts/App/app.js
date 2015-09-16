@@ -94,7 +94,7 @@
         $scope.saveServiceRequest = function () {
             var postData = {};
             postData.profile = {};
-            postData.CustomerID = 2; //TODO replace with customer ID
+            postData.CustomerID = 1; //TODO replace with customer ID
             postData.StartTime = $scope.startTime;
             //new Date("October 13, 2015 11:13:00");
             postData.serviceRequestVehicles = [];
@@ -133,6 +133,7 @@
         $scope.vehicleClassSelected = function (requestData) {
             requestData.showVehicleServices = true;
             requestData.vehicleService = {};
+            requestData.vehicleAddons = [];
         };
         $scope.vehicleServiceSelected = function (requestData) {
             requestData.showVehicleAddons = true;
