@@ -1,0 +1,233 @@
+﻿@model string
+@{
+    ViewBag.Title = "Index";
+}
+
+    <script type="text/javascript">
+        var vehMasterData = @Html.Raw(Model);
+    </script>
+
+    @*<link rel="stylesheet" href="css/fullcalendar.css">
+        <link rel="stylesheet" href="css/calendarDemo.css" />*@
+
+    <!-- <script src="script/jquery.min.js"></script> -->
+
+    @*<script src="script/moment.min.js"></script>
+        <script src="script/fullcalendar.js"></script>
+        <script src="script/gcal.js"></script>
+        <script src="script/calendar.js"></script>
+        <script src="script/calendarDemo.js"></script>*@
+
+        <div ng-app="service" class="textContentBox clearfix" ng-controller="MasterDataController as mdCtrl">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="panel with-nav-tabs panel-default">
+                        <div class="panel-heading">
+                            <ul class="nav nav-tabs">
+                                <li class="{{currentStep==1 ? 'active' : ''}}"><a data-toggle="tab">Vehicle Summary</a></li>
+                                <li class="{{currentStep==2 ? 'active' : ''}}"><a data-toggle="tab">Select Service(s)</a></li>
+                                <li class="{{currentStep==3 ? 'active' : ''}}"><a data-toggle="tab">Select Time</a></li>
+                                <li class="{{currentStep==4 ? 'active' : ''}}"><a data-toggle="tab">Profile</a></li>
+                                <li class="{{currentStep==5 ? 'active' : ''}}"><a data-toggle="tab">Finish</a></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="panel-body">
+                            <div class="tab-content">
+                                <div ng-view></div>
+
+                                <script type="text/ng-template" id="vehSummary.htm">
+                                    <h4>Vehicle Summary</h4>
+                                    <div class="form-group" ng-form name="vehCountForm">
+                                        Please provide number of vehicles requiring service: <input type="number" name="vehCount" ng-model="$parent.vehicleCount" required>
+                                        <span style="color:red" ng-show="vehCountForm.vehCount.$error.required">Vehicle count is required.</span>
+                                        <span class="pull-right">
+                                            <a href="#selService"><button name="buildRequests" ng-disabled="vehCountForm.vehCount.$error.required" ng-click="$parent.buildRequests(); $parent.currentStep=2;" class="btn btn-primary btn-sm">Next</button></a>
+                                        </span>
+                                    </div>
+                                </script>
+                                <script type="text/ng-template" id="selService.htm">
+                                    <h4>Vehicle Details</h4>
+                                    <div ng-repeat="requestData in $parent.outputData">
+                                        <ul class="cupSizeul clearfix">
+                                            <li class="medCupSize">Choose Vehicle Type: </li>
+                                            <li class="smallCupSize" ng-repeat="vehicle in requestData.masterData">
+                                                <div>
+                                                    <input name="vehicleType_{{$parent.$index}}" type="radio" ng-value="vehicle" ng-model="requestData.vehicle" ng-click="vehicleTypeSelected(requestData)" id="smallCupSize" /><img src="../Content/Images/{{vehicle.type}}.jpg" width=50 height=30 />
+                                                </div>
+                                            </li>
+                                        </ul>
+                                        <div class="clearfix" ng-show="requestData.showVehicleClasses">
+                                            <ul class="cupSizeul clearfix">
+                                                <li class="smallCupSize" for="vehicleClass">Vehicle Class : </li>
+                                                <li class="smallCupSize" ng-repeat="vehClass in requestData.vehicle.classes">
+                                                    <input type="radio" name="vehicleClass_{{$parent.$parent.$index}}_{{$parent.$index}}" ng-value="vehClass" ng-model="requestData.vehicleClass" ng-click="vehicleClassSelected(requestData)" />{{vehClass.name}}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="clearfix" ng-show="requestData.showVehicleServices">
+                                            <ul class="cupSizeul clearfix">
+                                                <li class="smallCupSize" for="services">Services : </li>
+                                                <li class="smallCupSize" ng-repeat="vehService in requestData.vehicleClass.services">
+                                                    <input type="radio" name="vehService_{{$parent.$parent.$index}}_{{$parent.$index}}" ng-value="vehService" ng-model="requestData.vehicleService" ng-click="vehicleServiceSelected(requestData)"></input>
+                                                    {{vehService.name}}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="clearfix" ng-show="requestData.showVehicleAddons">
+                                            <ul class="cupSizeul clearfix">
+                                                <li class="smallCupSize" for="addons">Add-ons : </li>
+                                                <li ng-repeat="vehAddon in requestData.vehicleService.addons">
+                                                    <input type="checkbox" name="vehAddon_{{$parent.$parent.$index}}_{{$parent.$index}}_{{$index}}" ng-true-value="{{vehAddon}}" ng-model="requestData.vehicleService.vehicleAddons[$index]"></input>
+                                                    {{vehAddon.name}}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <span class="pull-right">
+                                        <a href="#">
+                                            <button name="prevToService" ng-click="$parent.currentStep=1;" class="btn btn-primary btn-sm">Previous</button>
+                                        </a>
+                                        <a href="#selTime">
+                                            <button name="saveService" ng-click="$parent.currentStep=3;" class="btn btn-primary btn-sm">Next</button>
+                                        </a>
+                                    </span>
+                                </script>
+
+                                <input type="text" name="startTime" value="" ng-model="startTime" ng-show="currentStep==3" id="datetimepicker" />
+                                <script type="text/ng-template" id="selTime.htm">
+                                            <h4>Choose Date/Time</h4>
+                                    <span class="pull-right">
+                                        <a href="#selService">
+                                            <button name="prevToTime" ng-click="$parent.currentStep=2;" class="btn btn-primary btn-sm">Previous</button>
+                                        </a>
+                                        <a href="#enterProfile">
+                                            <button name="saveTime" ng-click="$parent.currentStep=4;" class="btn btn-primary btn-sm">Next</button>
+                                        </a>
+                                    </span>
+                                </script>
+                                <script type="text/ng-template" id="enterProfile.htm">
+                                    <h4>Enter Profile Info</h4>
+                                    <div class="form-horizontal" ng-form name="profileForm" role="form">
+                                        <div class="well">
+                                            <div class="form-group" ng-class="{ 'has-error': profileForm.fullName.$touched && profileForm.fullName.$invalid }">
+                                                <label class="control-label" for="fullName">Name:</label>
+                                                <input class="form-control" type="text" name="fullName" ng-model="$parent.outputData.profile.fullName" required>
+                                                <div class="help-block" ng-messages="profileForm.fullName.$error" ng-if="profileForm.fullName.$touched">
+                                                    <p ng-message="required">Name is required.</p>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" ng-class="{ 'has-error': profileForm.fullAddress.$touched && profileForm.fullAddress.$invalid }">
+                                                <label class="control-label" for="fullAddress">Address:</label>
+                                                <textarea class="form-control" name="fullAddress" ng-model="$parent.outputData.profile.fullAddress" required></textarea>
+                                                <div class="help-block" ng-messages="profileForm.fullAddress.$error" ng-if="profileForm.fullAddress.$touched">
+                                                    <p ng-message="required">Address is required.</p>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" ng-class="{ 'has-error': profileForm.email.$touched && profileForm.email.$invalid }">
+                                                <label class="control-label" for="email">Email:</label>
+                                                <input class="form-control" type="email" name="email" ng-model="$parent.outputData.profile.email" required>
+                                                <div class="help-block" ng-messages="profileForm.email.$error" ng-if="profileForm.email.$touched">
+                                                    <p ng-message="required">Email is required.</p>
+                                                    <p ng-message="email">Please enter valid Email.</p>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" ng-class="{ 'has-error': profileForm.phoneNumber.$touched && profileForm.phoneNumber.$invalid }">
+                                                <label class="control-label" for="phoneNumber">Phone number:</label>
+                                                <input class="form-control" type="text" name="phoneNumber" ng-model="$parent.outputData.profile.phoneNumber" required></textarea>
+                                                <div class="help-block" ng-messages="profileForm.phoneNumber.$error" ng-if="profileForm.phoneNumber.$touched">
+                                                    <p ng-message="required">Phone number is required.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <span class="pull-right">
+                                            <a href="#selTime"><button name="prevToProfile" ng-disabled="vehCountForm.vehCount.$error.required" ng-click="$parent.currentStep=3;" class="btn btn-primary btn-sm">Previous</button></a>
+                                            <a href="#finish"><button name="saveProfile" ng-click="$parent.currentStep=5;$parent.saveServiceRequest();" class="btn btn-primary btn-sm">Order Now</button></a>
+                                        </span>
+                                    </div>
+                                </script>
+                                <script type="text/ng-template" id="finish.htm">
+                                    Your service request has been registered successfully. Find below the details.
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4"  ng-show="currentStep<5">
+                    <div class="orderRightInnerBlock">
+                        <h2>Service Order Summary</h2>
+                        <table class="tableStyle marginTop15" id="minicart">
+                            <thead>
+                            <th class="w40P first">Veh. Type</th>
+                            <th class="w40P">Service</th>
+                            <th class="w20P">Price</th>
+                            </thead>
+                            <tbody>
+                                <tr ng-hide="outputData.length>0" id="emptymsg">
+                                    <td colspan="3" class="w40`P first">No Service Selected</td>
+                                </tr>
+                                <tr ng-repeat="requestData in outputData">
+                                    <td colspan="1" class="w40P first">{{requestData.vehicle.type}}</td>
+                                    <td colspan="1" class="w40P first">
+                                        {{requestData.vehicleService.name}}
+                                        <ul>
+                                            <li ng-repeat="serviceAddon in requestData.vehicleAddons" ng-if="serviceAddon.name">
+                                                {{serviceAddon.name}}({{serviceAddon.cost}}KD)
+                                            </li>
+                                        </ul>
+                                    </td>
+                                    <td colspan="1" class="ttlprice subtotal" >{{getCostForRequest(requestData)}} KD</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="totalP">
+                                    <td class="ttlHead" colspan="2">Sub Total: </td>
+                                    <td class="ttlprice subtotal" colspan="1"> {{calculateSubTotalCost()}} KD</td>
+                                </tr>
+                                <tr class="totalP totalBdr">
+                                    <td class="ttlHead" colspan="2">Delivery Charges:</td>
+                                    <td class="ttlprice deliverycharge" colspan="1"> 0.00 KD</td>
+                                </tr>
+                                <tr class="totalP grnd">
+                                    <td class="ttlHead" colspan="2">Grand Total  : </td>
+                                    <td class="ttlprice grandtotal" colspan="1"> {{calculateTotalCost()}} KD</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<script>
+/*
+window.onerror = function(errorMsg) {
+	$('#console').html($('#console').html()+'<br>'+errorMsg)
+}*/
+
+$('#datetimepicker').datetimepicker({ dayOfWeekStart : 1, lang:'en', disabledDates:['1986/01/08','1986/01/09','1986/01/10'], startDate:	'2015/09/16' });
+
+$('#datetimepicker').datetimepicker({value:'2015/04/15 05:03',step:10});
+
+$('.some_class').datetimepicker();
+
+$('#default_datetimepicker').datetimepicker({
+	formatTime:'H:i',
+	formatDate:'d.m.Y',
+	//defaultDate:'8.12.1986', // it's my birthday
+	defaultDate:'+03.01.1970', // it's my birthday
+
+defaultTime:'10:00',
+	timepickerScrollbar:false
+});
+
+$('#datetimepicker10').datetimepicker({	step:5,	inline:true});
+
+$('#datetimepicker_mask').datetimepicker({	mask:'9999/19/39 29:59'});
+
+
+$('#datetimepicker_dark').datetimepicker({theme:'dark'})
+
+</script>
+

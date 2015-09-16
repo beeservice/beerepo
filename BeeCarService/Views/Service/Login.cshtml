@@ -1,0 +1,55 @@
+﻿@model BeeCarService.Data.BeeUser
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@using (Html.BeginForm("Login", "Service", FormMethod.Post))
+{
+    //this  is for create form tag
+    @Html.AntiForgeryToken()          
+
+    // this is for prevent CSRF attack
+    @Html.ValidationSummary(true)
+
+    if (@ViewBag.Message != null)
+    {
+        <div style="border:1px solid red">
+            @ViewBag.Message
+        </div>
+    }
+    <div ng-app="service" class="textContentBox clearfix" ng-controller="MasterDataController as mdCtrl">
+        <div class="row">
+            <div class="col-md-12">
+
+                    <table align="center">
+                        <tr>
+                            <td>@Html.LabelFor(a => a.Username)</td>
+                            <td>@Html.TextBoxFor(a => a.Username)</td>
+                            <td>@Html.ValidationMessageFor(a => a.Username)</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.LabelFor(a => a.Password)
+                            </td>
+                            <td>
+                                @Html.PasswordFor(a => a.Password)
+                            </td>
+                            <td>
+                                @Html.ValidationMessageFor(a => a.Password)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <input type="submit" value="Login" />
+                            </td>
+                            <td></td>
+                        </tr>
+                    </table>
+            </div>
+        </div>
+    </div>
+}
+
