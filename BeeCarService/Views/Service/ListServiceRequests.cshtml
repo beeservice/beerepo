@@ -1,0 +1,47 @@
+﻿@{
+    ViewBag.Title = "ListServiceRequests";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+<div class="container">
+    <div ng-app="service" ng-controller="ListServiceRequestCtrl as lstSerReqCtrl" ng-init="getExistingServiceRequests()">
+
+        <div class="table">
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-8">
+                    <strong class="panel-title">Service Requests</strong>
+                </div>
+                <div class="col-sm-2">
+                    <a ng-href="/Service/Index" class="btn btn-primary pull-right">Create Service Request</a>
+                </div>
+                <div class="col-sm-1"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-1"></div>
+            <div class="col-sm-10">
+                <div class="row panel-heading">
+                    <div class="col-xs-2">Service Request ID</div>
+                    <div class="col-xs-4">Start Time</div>
+                    <div class="col-xs-2">No. Of Vehicles</div>
+                    <div class="col-xs-4"></div>
+                </div>
+
+                <div class="row" ng-repeat="serviceRequest in existingServiceRequests">
+                    <div class="col-xs-2">SReq-{{serviceRequest.id}}</div>
+                    <div class="col-xs-4">{{serviceRequest.startTime}}</div>
+                    <div class="col-xs-2">{{serviceRequest.vehicleCount}}</div>
+                    <div class="col-xs-4">
+                        <a ng-href="/Service/Index?SRID={{serviceRequest.id}}" class="btn btn-primary">Edit</a>
+                        <!--<button name="editServieRequest_{{$index}}" ng-click="editServiceRequest(serviceRequest.id)" class="btn btn-primary btn-sm">Edit</button>
+                        --><button name="cancelServiceRequest_{{serviceRequest.id}}" ng-click="cancelServiceRequest(serviceRequest.id)" class="btn btn-primary btn-sm">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-1"></div>
+        </div>
+    </div>
+</div>

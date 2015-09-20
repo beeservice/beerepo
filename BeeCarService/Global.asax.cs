@@ -14,5 +14,6 @@ namespace BeeCarService
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
         }
+
     }
 }

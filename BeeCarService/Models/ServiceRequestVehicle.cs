@@ -10,6 +10,6 @@ namespace BeeCarService.Models
         public int VehicleTypeID { get; set; }
         public int VehicleClassID { get; set; }
         public int ServiceTypeID { get; set; }
-        public List<int> VehicleAddOnIDs { get; set; }
+        public int [] VehicleAddonIDs { get; set; }
     }
 }

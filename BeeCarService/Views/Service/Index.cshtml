@@ -1,10 +1,11 @@
-﻿@model string
+﻿@model BeeCarService.Models.SRClientModel
 @{
     ViewBag.Title = "Index";
 }
 
     <script type="text/javascript">
-        var vehMasterData = @Html.Raw(Model);
+        var vehMasterData = @Html.Raw(Model.MasterData);
+        var serverOutputData = @Html.Raw(Model.ClientSR);
     </script>
 
     @*<link rel="stylesheet" href="css/fullcalendar.css">
@@ -18,7 +19,7 @@
         <script src="script/calendar.js"></script>
         <script src="script/calendarDemo.js"></script>*@
 
-        <div ng-app="service" class="textContentBox clearfix" ng-controller="MasterDataController as mdCtrl">
+        <div ng-app="service" class="textContentBox clearfix" ng-controller="MasterDataController as mdCtrl" ng-init="loadRequests()">
             <div class="row">
                 <div class="col-md-8">
                     <div class="panel with-nav-tabs panel-default">
@@ -38,7 +39,7 @@
 
                                 <script type="text/ng-template" id="vehSummary.htm">
                                     <h4>Vehicle Summary</h4>
-                                    <div class="form-group" ng-form name="vehCountForm">
+                                    <div class="form-group" name="vehCountForm">
                                         Please provide number of vehicles requiring service: <input type="number" name="vehCount" ng-model="$parent.vehicleCount" required>
                                         <span style="color:red" ng-show="vehCountForm.vehCount.$error.required">Vehicle count is required.</span>
                                         <span class="pull-right">
@@ -46,42 +47,41 @@
                                         </span>
                                     </div>
                                 </script>
+
                                 <script type="text/ng-template" id="selService.htm">
-                                    <h4>Vehicle Details</h4>
-                                    <div ng-repeat="requestData in $parent.outputData">
-                                        <ul class="cupSizeul clearfix">
-                                            <li class="medCupSize">Choose Vehicle Type: </li>
-                                            <li class="smallCupSize" ng-repeat="vehicle in requestData.masterData">
-                                                <div>
-                                                    <input name="vehicleType_{{$parent.$index}}" type="radio" ng-value="vehicle" ng-model="requestData.vehicle" ng-click="vehicleTypeSelected(requestData)" id="smallCupSize" /><img src="../Content/Images/{{vehicle.type}}.jpg" width=50 height=30 />
+                                    <div ng-repeat="requestData in $parent.outputData.serviceRequestVehicles"  class="well table-bordered">
+                                        Vehicle # {{$index+1}}
+                                        <div class="well-sm table-bordered pBottom30">
+                                            <div class="row">
+                                                <div class="col-xs-2">Choose One:</div>
+                                                <div class="col-xs-1" ng-repeat="vehicleType in masterData">
+                                                    <input name="vehicleType_{{$parent.$index}}" type="radio" ng-value="vehicleType.id" ng-model="requestData.vehicleTypeID" ng-click="vehicleTypeSelected(requestData)" id="smallCupSize" /><img src="../Content/Images/{{vehicleType.type}}.jpg" width=50 height=30 /> {{vehicleType.type}}
                                                 </div>
-                                            </li>
-                                        </ul>
-                                        <div class="clearfix" ng-show="requestData.showVehicleClasses">
-                                            <ul class="cupSizeul clearfix">
-                                                <li class="smallCupSize" for="vehicleClass">Vehicle Class : </li>
-                                                <li class="smallCupSize" ng-repeat="vehClass in requestData.vehicle.classes">
-                                                    <input type="radio" name="vehicleClass_{{$parent.$parent.$index}}_{{$parent.$index}}" ng-value="vehClass" ng-model="requestData.vehicleClass" ng-click="vehicleClassSelected(requestData)" />{{vehClass.name}}
-                                                </li>
-                                            </ul>
+                                            </div>
                                         </div>
-                                        <div class="clearfix" ng-show="requestData.showVehicleServices">
-                                            <ul class="cupSizeul clearfix">
-                                                <li class="smallCupSize" for="services">Services : </li>
-                                                <li class="smallCupSize" ng-repeat="vehService in requestData.vehicleClass.services">
-                                                    <input type="radio" name="vehService_{{$parent.$parent.$index}}_{{$parent.$index}}" ng-value="vehService" ng-model="requestData.vehicleService" ng-click="vehicleServiceSelected(requestData)"></input>
-                                                    {{vehService.name}}
-                                                </li>
-                                            </ul>
+                                        <div class="well-sm table-bordered"  ng-show="requestData.showVehicleClasses">
+                                            <div class="row">
+                                                <div class="col-sm-2">Vehicle Type : </div>
+                                                <div class="col-sm-1" ng-repeat="vehClass in getSelectedVehType(requestData.vehicleTypeID).classes">
+                                                    <input type="radio" name="vehicleClass_{{$parent.$parent.$index}}_{{$parent.$index}}" ng-value="vehClass.id" ng-model="requestData.vehicleClassID" ng-click="vehicleClassSelected(requestData)" />{{vehClass.name}}
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="clearfix" ng-show="requestData.showVehicleAddons">
-                                            <ul class="cupSizeul clearfix">
-                                                <li class="smallCupSize" for="addons">Add-ons : </li>
-                                                <li ng-repeat="vehAddon in requestData.vehicleService.addons">
-                                                    <input type="checkbox" name="vehAddon_{{$parent.$parent.$index}}_{{$parent.$index}}_{{$index}}" ng-true-value="{{vehAddon}}" ng-model="requestData.vehicleAddons[$index]"></input>
-                                                    {{vehAddon.name}}
-                                                </li>
-                                            </ul>
+                                        <div class="well-sm table-bordered" ng-show="requestData.showVehicleServices">
+                                            <div class="row">
+                                                <div class="col-sm-2">Vehicle Type : </div>
+                                                <div class="col-sm-1" ng-repeat="vehService in getSelectedVehClass(requestData.vehicleTypeID,requestData.vehicleClassID).services">
+                                                    <input type="radio" name="vehService_{{$parent.$parent.$index}}_{{$parent.$index}}" ng-value="vehService.id" ng-model="requestData.serviceTypeID" ng-click="vehicleServiceSelected(requestData)">{{vehService.name}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="well-sm table-bordered" ng-show="requestData.showVehicleAddons && requestData.serviceTypeID != undefined && requestData.serviceTypeID != 0">
+                                            <div class="row">
+                                                <div class="col-sm-2">Vehicle Type : </div>
+                                                <div class="col-sm-1" ng-repeat="vehAddon in getSelectedVehServiceType(requestData.vehicleTypeID,requestData.vehicleClassID,requestData.serviceTypeID).addons">
+                                                    <input type="checkbox" name="vehAddon_{{$parent.$parent.$index}}_{{$parent.$index}}_{{$index}}" value={{vehAddon.id}} ng-checked="{{requestData.vehicleAddonIDs.indexOf(vehAddon.id) > -1}}" ng-click="toggleSelection(requestData, vehAddon.id)">{{vehAddon.name}}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <span class="pull-right">
@@ -94,7 +94,7 @@
                                     </span>
                                 </script>
 
-                                <input type="text" name="startTime" value="" ng-model="startTime" ng-show="currentStep==3" id="datetimepicker" />
+                                <input type="text" name="startTime" value="" ng-model="outputData.startTime" ng-show="currentStep==3" id="datetimepicker" />
                                 <script type="text/ng-template" id="selTime.htm">
                                             <h4>Choose Date/Time</h4>
                                     <span class="pull-right">
@@ -107,37 +107,75 @@
                                     </span>
                                 </script>
                                 <script type="text/ng-template" id="enterProfile.htm">
-                                    <h4>Enter Profile Info</h4>
-                                    <div class="form-horizontal" ng-form name="profileForm" role="form">
-                                        <div class="well">
-                                            <div class="form-group" ng-class="{ 'has-error': profileForm.fullName.$touched && profileForm.fullName.$invalid }">
-                                                <label class="control-label" for="fullName">Name:</label>
-                                                <input class="form-control" type="text" name="fullName" ng-model="$parent.outputData.profile.fullName" required>
-                                                <div class="help-block" ng-messages="profileForm.fullName.$error" ng-if="profileForm.fullName.$touched">
-                                                    <p ng-message="required">Name is required.</p>
-                                                </div>
+                                    <div ng-form name="profileForm" role="form">
+                                        <div class="form-group col-sm-12" ng-class="{ 'has-error': profileForm.fullName.$touched && profileForm.fullName.$invalid }">
+                                            <label class="col-sm-3 control-label" for="fullName">Name{{$parent.outputData.beeUser.fullName}}:</label>
+                                            <div class="col-sm-4">
+                                                <input class="form-control input-sm" type="text" name="fullName" ng-model="$parent.outputData.beeUser.fullName" required>
                                             </div>
-                                            <div class="form-group" ng-class="{ 'has-error': profileForm.fullAddress.$touched && profileForm.fullAddress.$invalid }">
-                                                <label class="control-label" for="fullAddress">Address:</label>
-                                                <textarea class="form-control" name="fullAddress" ng-model="$parent.outputData.profile.fullAddress" required></textarea>
-                                                <div class="help-block" ng-messages="profileForm.fullAddress.$error" ng-if="profileForm.fullAddress.$touched">
-                                                    <p ng-message="required">Address is required.</p>
-                                                </div>
+                                            <div class="help-block" ng-messages="profileForm.fullName.$error" ng-if="profileForm.fullName.$touched">
+                                                <p ng-message="required">Name is required.</p>
                                             </div>
-                                            <div class="form-group" ng-class="{ 'has-error': profileForm.email.$touched && profileForm.email.$invalid }">
-                                                <label class="control-label" for="email">Email:</label>
-                                                <input class="form-control" type="email" name="email" ng-model="$parent.outputData.profile.email" required>
-                                                <div class="help-block" ng-messages="profileForm.email.$error" ng-if="profileForm.email.$touched">
-                                                    <p ng-message="required">Email is required.</p>
-                                                    <p ng-message="email">Please enter valid Email.</p>
-                                                </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12" ng-class="{ 'has-error': profileForm.address.$touched && profileForm.address.$invalid }">
+                                            <label class="col-sm-3 control-label" for="address">Address:</label>
+                                            <div class="col-sm-9">
+                                                <input class="form-control input-sm" type="text" name="address" ng-model="$parent.outputData.beeUser.address" required>
                                             </div>
-                                            <div class="form-group" ng-class="{ 'has-error': profileForm.phoneNumber.$touched && profileForm.phoneNumber.$invalid }">
-                                                <label class="control-label" for="phoneNumber">Phone number:</label>
-                                                <input class="form-control" type="text" name="phoneNumber" ng-model="$parent.outputData.profile.phoneNumber" required></textarea>
-                                                <div class="help-block" ng-messages="profileForm.phoneNumber.$error" ng-if="profileForm.phoneNumber.$touched">
-                                                    <p ng-message="required">Phone number is required.</p>
-                                                </div>
+                                            <div class="help-block col-sm-offset-3" ng-messages="profileForm.address.$error" ng-if="profileForm.address.$touched">
+                                                <p ng-message="required">Address is required.</p>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12" ng-class="{ 'has-error': profileForm.phone.$touched && profileForm.phone.$invalid }">
+                                            <label class="col-sm-3 control-label" for="phone">Phone number:</label>
+                                            <div class="col-sm-4">
+                                                <input class="form-control input-sm" type="text" name="phone" ng-model="$parent.outputData.beeUser.phone" required>
+                                            </div>
+                                            <div class="help-block" ng-messages="profileForm.phone.$error" ng-if="profileForm.phone.$touched">
+                                                <p ng-message="required">Phone number is required.</p>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12" ng-class="{ 'has-error': profileForm.email.$touched && profileForm.email.$invalid }">
+                                            <label class="col-sm-3 control-label" for="email">Email:</label>
+                                            <div class="col-sm-6">
+                                                <input class="form-control input-sm" type="email" name="email" ng-model="$parent.outputData.beeUser.email" required>
+                                            </div>
+                                            <div class="help-block" ng-messages="profileForm.email.$error" ng-if="profileForm.email.$touched">
+                                                <p ng-message="required">Email is required.</p>
+                                                <p ng-message="email">Please enter valid Email.</p>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-sm-3 control-label" for="landmark">Landmark:</label>
+                                            <div class="col-sm-4">
+                                                <input class="form-control input-sm" type="text" name="landmark" ng-model="$parent.outputData.beeUser.landmark">
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-sm-3 control-label" for="message">Message:</label>
+                                            <div class="col-sm-4">
+                                                <textarea class="form-control input-sm" name="message" ng-model="$parent.outputData.beeUser.message"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-sm-3 control-label" for="contactPreference">Contact Preference:</label>
+                                            <div class="col-sm-4">
+                                                <input type="radio" name="contactPreference" value="1" ng-model="$parent.outputData.beeUser.contactPreference">Phone
+                                                <input type="radio" name="contactPreference" value="2" ng-model="$parent.outputData.beeUser.contactPreference">Email
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-sm-3 control-label" for="textNotifications">Text Notifications:</label>
+                                            <div class="col-sm-4">
+                                                <input type="checkbox" name="textNotifications" ng-model="$parent.outputData.beeUser.textNotifications">
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-sm-3 control-label" for="paymentMode">Payment Mode:</label>
+                                            <div class="col-sm-4">
+                                                <input type="radio" name="paymentMode" value="1" ng-model="$parent.outputData.beeUser.paymentMode">Cash
+                                                <input type="radio" name="paymentMode" value="2" ng-model="$parent.outputData.beeUser.paymentMode">Credit Card
                                             </div>
                                         </div>
                                         <span class="pull-right">
@@ -159,18 +197,20 @@
                         <h2>Service Order Summary</h2>
                         <table class="tableStyle marginTop15" id="minicart">
                             <thead>
-                            <th class="w40P first">Veh. Type</th>
-                            <th class="w40P">Service</th>
-                            <th class="w20P">Price</th>
+                                <tr>
+                                    <th class="w40P first">Veh. Type
+                                    <th class="w40P">Service</th>
+                                    <th class="w20P">Price</th>
+                                </tr>
                             </thead>
                             <tbody>
-                                <tr ng-hide="outputData.length>0" id="emptymsg">
+                                <tr ng-hide="outputData.serviceRequestVehicles.length>0" id="emptymsg">
                                     <td colspan="3" class="w40`P first">No Service Selected</td>
                                 </tr>
-                                <tr ng-repeat="requestData in outputData">
-                                    <td colspan="1" class="w40P first">{{requestData.vehicle.type}}</td>
+                                <tr ng-repeat="requestData in outputData.serviceRequestVehicles">
+                                    <td colspan="1" class="w40P first">{{getSelectedVehType(requestData.vehicleTypeID).type}}</td>
                                     <td colspan="1" class="w40P first">
-                                        {{requestData.vehicleService.name}}
+                                        <p ng-if="requestData.serviceTypeID != undefined && requestData.serviceTypeID != 0">{{getSelectedVehServiceType(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID).name}}</p>
                                         <ul>
                                             <li ng-repeat="serviceAddon in requestData.vehicleAddons" ng-if="serviceAddon.name">
                                                 {{serviceAddon.name}}({{serviceAddon.cost}}KD)
@@ -181,16 +221,8 @@
                                 </tr>
                             </tbody>
                             <tfoot>
-                                <tr class="totalP">
-                                    <td class="ttlHead" colspan="2">Sub Total: </td>
-                                    <td class="ttlprice subtotal" colspan="1"> {{calculateSubTotalCost()}} KD</td>
-                                </tr>
-                                <tr class="totalP totalBdr">
-                                    <td class="ttlHead" colspan="2">Delivery Charges:</td>
-                                    <td class="ttlprice deliverycharge" colspan="1"> 0.00 KD</td>
-                                </tr>
                                 <tr class="totalP grnd">
-                                    <td class="ttlHead" colspan="2">Grand Total  : </td>
+                                    <td class="ttlHead" colspan="2">Total  : </td>
                                     <td class="ttlprice grandtotal" colspan="1"> {{calculateTotalCost()}} KD</td>
                                 </tr>
                             </tfoot>

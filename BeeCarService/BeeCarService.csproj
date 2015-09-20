@@ -161,7 +161,8 @@
     <Content Include="Scripts\angular-mocks.js" />
     <Content Include="Scripts\angular.js" />
     <Content Include="Scripts\angular.min.js" />
-    <Content Include="Scripts\App\app.js" />
+    <Content Include="Scripts\app.js" />
+    <Content Include="Scripts\bootbox.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <EntityDeploy Include="Data\BeeCarServiceConnection.edmx">
@@ -232,11 +233,13 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\BeeUser.cs" />
     <Compile Include="Models\MasterData.cs" />
     <Compile Include="Models\ServiceAddon.cs" />
     <Compile Include="Models\ServiceRequest.cs" />
     <Compile Include="Models\ServiceRequestVehicle.cs" />
     <Compile Include="Models\ServiceType.cs" />
+    <Compile Include="Models\SRClientModel.cs" />
     <Compile Include="Models\VechicleClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -254,6 +257,7 @@
     <Content Include="Views\Service\Login.cshtml" />
     <Content Include="Views\Service\Home.cshtml" />
     <Content Include="Views\Service\ServiceDetails.cshtml" />
+    <Content Include="Views\Service\ListServiceRequests.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -263,6 +267,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Scripts\App\" />
     <Folder Include="Views\ServiceRequest\" />
   </ItemGroup>
   <ItemGroup>
