@@ -40,10 +40,10 @@
     <div class="container" style="background-color:beige">
 
         <header>
-            <a href="http://bpmex.com//"><img src="~/Content/Images/logo.jpg" height=100 width=100></a>
+            <a href="/Service/home"><img src="~/Content/Images/logo.jpg" height=100 width=100></a>
             <nav>
-                <ul class="nav nav-pills">
-                    <li><a href="#" title="Home">Home</a></li>
+                <ul class="nav navbar-nav">
+                    <li><a href="/Service/home" title="Home">Home</a></li>
                     <li><a href="#" title="Work">Work</a></li>
                     <li><a href="#" title="Clients">Clients</a></li>
                     <li><a href="#" title="Contact">Contact</a></li>
@@ -53,10 +53,11 @@
         </header>
 
             @RenderBody()
-            <hr />
-            <footer>
-                <p>&copy; @DateTime.Now.Year - Bee Car Service</p>
-            </footer>
+ 
+        <div> </div>
+        <div class="row table-bordered">
+                <p class="center bottom">&copy; @DateTime.Now.Year - Bee Car Service</pclass="center>
         </div>
+    </div>
 </body>
 </html>
