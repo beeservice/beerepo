@@ -84,6 +84,11 @@ namespace BeeCarService.Controllers
 
         public ActionResult ListServiceRequests()
         {
+            if (Session["LogedUserID"] == null  || Session["LogedUserID"].ToString() == "")
+            {
+                return RedirectToAction("Login");
+            }
+
             return View("ListServiceRequests");
         }
 
