@@ -6,7 +6,53 @@
     <script type="text/javascript">
         var vehMasterData = @Html.Raw(Model.MasterData);
         var serverOutputData = @Html.Raw(Model.ClientSR);
-    </script>
+
+        var myTitle='Test Test';
+        $(document).ready(function () {
+
+            var eventData;
+            $('#calendar').fullCalendar({
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek,agendaDay'
+                },
+                defaultDate: '2015-09-21',
+                selectable: true,
+                selectHelper: true,
+                unselectAuto: true,
+                select: function (start, end) {
+                    $('#calendar').fullCalendar('removeEvents');
+                    var title = myTitle;
+                    if (title) {
+                        eventData = {
+                            title: title,
+                            start: start,
+                            end: end
+                        };
+                        $('#calendar').fullCalendar('renderEvent', eventData, true); // stick? = true
+                    }
+                },
+                editable: true,
+                eventLimit: true // allow "more" link when too many events
+            });
+
+        });
+
+</script>
+<style>
+    body {
+        margin: 40px 10px;
+        padding: 0;
+        font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
+        font-size: 14px;
+    }
+
+    #calendar {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+</style>
 
     @*<link rel="stylesheet" href="css/fullcalendar.css">
         <link rel="stylesheet" href="css/calendarDemo.css" />*@
@@ -37,25 +83,25 @@
                             <div class="tab-content">
                                 <div ng-view></div>
 
-                                <script type="text/ng-template" id="vehSummary.htm">
+                                <div ng-show="currentStep==1">
                                     <h4>Vehicle Summary</h4>
                                     <div class="form-group" name="vehCountForm">
-                                        Please provide number of vehicles requiring service: <input type="number" name="vehCount" ng-model="$parent.vehicleCount" required>
+                                        Please provide number of vehicles requiring service: <input type="number" name="vehCount" ng-model="vehicleCount" required>
                                         <span style="color:red" ng-show="vehCountForm.vehCount.$error.required">Vehicle count is required.</span>
                                         <span class="pull-right">
-                                            <a href="#selService"><button name="buildRequests" ng-disabled="vehCountForm.vehCount.$error.required" ng-click="$parent.buildRequests(); $parent.currentStep=2;" class="btn btn-primary btn-sm">Next</button></a>
+                                            <a href="#"><button name="buildRequests" ng-disabled="vehCountForm.vehCount.$error.required" ng-click="buildRequests(); currentStep=2;" class="btn btn-primary btn-sm">Next</button></a>
                                         </span>
                                     </div>
-                                </script>
+                                </div>
 
-                                <script type="text/ng-template" id="selService.htm">
-                                    <div ng-repeat="requestData in $parent.outputData.serviceRequestVehicles"  class="well table-bordered" style="font-size:12px" >
+                                <div ng-show="currentStep==2">
+                                    <div ng-repeat="requestData in outputData.serviceRequestVehicles"  class="well table-bordered" style="font-size:12px" >
                                         Vehicle # {{$index+1}}
                                         <div class="well-sm table-bordered">
                                             <div class="row">
                                                 <div class="col-xs-2">Choose One:</div>
                                                 <div class="col-xs-1" ng-repeat="vehicleType in masterData">
-                                                    <input name="vehicleType_{{$parent.$index}}" type="radio" ng-value="vehicleType.id" ng-model="requestData.vehicleTypeID" ng-click="vehicleTypeSelected(requestData)" /><img src="/Content/Images/{{vehicleType.type}}.jpg" width=50 height=30 /> {{vehicleType.type}}
+                                                    <input name="vehicleType_{{$index}}" type="radio" ng-value="vehicleType.id" ng-model="requestData.vehicleTypeID" ng-click="vehicleTypeSelected(requestData)" /><img src="/Content/Images/{{vehicleType.type}}.jpg" width=50 height=30 /> {{vehicleType.type}}
                                                 </div>
                                             </div>
                                         </div>
@@ -63,7 +109,7 @@
                                             <div class="row">
                                                 <div class="col-xs-2">Vehicle Type : </div>
                                                 <div class="col-xs-1" ng-repeat="vehClass in getSelectedVehType(requestData.vehicleTypeID).classes">
-                                                    <input type="radio" name="vehicleClass_{{$parent.$parent.$index}}_{{$parent.$index}}" ng-value="vehClass.id" ng-model="requestData.vehicleClassID" ng-click="vehicleClassSelected(requestData)" /><img src="/Content/Images/{{vehicleClass.name}}.jpg" width=50 height=30 />{{vehClass.name}}
+                                                    <input type="radio" name="vehicleClass_{{$parent.$index}}_{{$index}}" ng-value="vehClass.id" ng-model="requestData.vehicleClassID" ng-click="vehicleClassSelected(requestData)" /><img src="/Content/Images/{{vehicleClass.name}}.jpg" width=50 height=30 />{{vehClass.name}}
                                                 </div>
                                             </div>
                                         </div>
@@ -71,7 +117,7 @@
                                             <div class="row">
                                                 <div class="col-xs-2">Service Type : </div>
                                                 <div class="col-xs-1" ng-repeat="vehService in getSelectedVehClass(requestData.vehicleTypeID,requestData.vehicleClassID).services">
-                                                    <input type="radio" name="vehService_{{$parent.$parent.$index}}_{{$parent.$index}}" ng-value="vehService.id" ng-model="requestData.serviceTypeID" ng-click="vehicleServiceSelected(requestData)">{{vehService.name}}
+                                                    <input type="radio" name="vehService_{{$parent.$index}}_{{$index}}" ng-value="vehService.id" ng-model="requestData.serviceTypeID" ng-click="vehicleServiceSelected(requestData)">{{vehService.name}}
                                                 </div>
                                             </div>
                                         </div>
@@ -79,39 +125,39 @@
                                             <div class="row">
                                                 <div class="col-xs-2">Add On : </div>
                                                 <div class="col-xs-1" ng-repeat="vehAddon in getSelectedVehServiceType(requestData.vehicleTypeID,requestData.vehicleClassID,requestData.serviceTypeID).addons">
-                                                    <input type="checkbox" name="vehAddon_{{$parent.$parent.$index}}_{{$parent.$index}}_{{$index}}" value={{vehAddon.id}} ng-checked="{{requestData.vehicleAddonIDs.indexOf(vehAddon.id) > -1}}" ng-click="toggleSelection(requestData, vehAddon.id)">{{vehAddon.name}}
+                                                    <input type="checkbox" name="vehAddon_{{$parent.$index}}_{{$index}}" value={{vehAddon.id}} ng-checked="{{requestData.vehicleAddonIDs.indexOf(vehAddon.id) > -1}}" ng-click="toggleSelection(requestData, vehAddon.id)">{{vehAddon.name}}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <span class="pull-right">
                                         <a href="#">
-                                            <button name="prevToService" ng-click="$parent.currentStep=1;" class="btn btn-primary btn-sm">Previous</button>
+                                            <button name="prevToService" ng-click="currentStep=1;" class="btn btn-primary btn-sm">Previous</button>
                                         </a>
-                                        <a href="#selTime">
-                                            <button name="saveService" ng-click="$parent.currentStep=3;" class="btn btn-primary btn-sm">Next</button>
+                                        <a href="#">
+                                            <button name="saveService" ng-click="currentStep=3;" class="btn btn-primary btn-sm">Next</button>
                                         </a>
                                     </span>
-                                </script>
+                                </div>
 
-                                <input type="text" name="startTime" value="" ng-model="outputData.startTime" ng-show="currentStep==3" id="datetimepicker" />
-                                <script type="text/ng-template" id="selTime.htm">
-                                            <h4>Choose Date/Time</h4>
+                                <div ng-show="currentStep==3">
+                                    <h4>Choose Date/Time</h4>
+                                    <div id='calendar'></div>
                                     <span class="pull-right">
-                                        <a href="#selService">
-                                            <button name="prevToTime" ng-click="$parent.currentStep=2;" class="btn btn-primary btn-sm">Previous</button>
+                                        <a href="#">
+                                            <button name="prevToTime" ng-click="currentStep=2;" class="btn btn-primary btn-sm">Previous</button>
                                         </a>
-                                        <a href="#enterProfile">
-                                            <button name="saveTime" ng-click="$parent.currentStep=4;" class="btn btn-primary btn-sm">Next</button>
+                                        <a href="#">
+                                            <button name="saveTime" ng-click="currentStep=4;" class="btn btn-primary btn-sm">Next</button>
                                         </a>
                                     </span>
-                                </script>
-                                <script type="text/ng-template" id="enterProfile.htm">
+                                </div>
+                                <div ng-show="currentStep==4">
                                     <div ng-form name="profileForm" role="form">
                                         <div class="form-group col-sm-12" ng-class="{ 'has-error': profileForm.fullName.$touched && profileForm.fullName.$invalid }">
-                                            <label class="col-sm-3 control-label" for="fullName">Name{{$parent.outputData.beeUser.fullName}}:</label>
+                                            <label class="col-sm-3 control-label" for="fullName">Name{{outputData.beeUser.fullName}}:</label>
                                             <div class="col-sm-4">
-                                                <input class="form-control input-sm" type="text" name="fullName" ng-model="$parent.outputData.beeUser.fullName" required>
+                                                <input class="form-control input-sm" type="text" name="fullName" ng-model="outputData.beeUser.fullName" required>
                                             </div>
                                             <div class="help-block" ng-messages="profileForm.fullName.$error" ng-if="profileForm.fullName.$touched">
                                                 <p ng-message="required">Name is required.</p>
@@ -121,7 +167,7 @@
                                         <div class="form-group col-sm-12" ng-class="{ 'has-error': profileForm.address.$touched && profileForm.address.$invalid }">
                                             <label class="col-sm-3 control-label" for="address">Address:</label>
                                             <div class="col-sm-9">
-                                                <input class="form-control input-sm" type="text" name="address" ng-model="$parent.outputData.beeUser.address" required>
+                                                <input class="form-control input-sm" type="text" name="address" ng-model="outputData.beeUser.address" required>
                                             </div>
                                             <div class="help-block col-sm-offset-3" ng-messages="profileForm.address.$error" ng-if="profileForm.address.$touched">
                                                 <p ng-message="required">Address is required.</p>
@@ -130,7 +176,7 @@
                                         <div class="form-group col-sm-12" ng-class="{ 'has-error': profileForm.phone.$touched && profileForm.phone.$invalid }">
                                             <label class="col-sm-3 control-label" for="phone">Phone number:</label>
                                             <div class="col-sm-4">
-                                                <input class="form-control input-sm" type="text" name="phone" ng-model="$parent.outputData.beeUser.phone" required>
+                                                <input class="form-control input-sm" type="text" name="phone" ng-model="outputData.beeUser.phone" required>
                                             </div>
                                             <div class="help-block" ng-messages="profileForm.phone.$error" ng-if="profileForm.phone.$touched">
                                                 <p ng-message="required">Phone number is required.</p>
@@ -139,7 +185,7 @@
                                         <div class="form-group col-sm-12" ng-class="{ 'has-error': profileForm.email.$touched && profileForm.email.$invalid }">
                                             <label class="col-sm-3 control-label" for="email">Email:</label>
                                             <div class="col-sm-6">
-                                                <input class="form-control input-sm" type="email" name="email" ng-model="$parent.outputData.beeUser.email" required>
+                                                <input class="form-control input-sm" type="email" name="email" ng-model="outputData.beeUser.email" required>
                                             </div>
                                             <div class="help-block" ng-messages="profileForm.email.$error" ng-if="profileForm.email.$touched">
                                                 <p ng-message="required">Email is required.</p>
@@ -149,44 +195,44 @@
                                         <div class="form-group col-sm-12">
                                             <label class="col-sm-3 control-label" for="landmark">Landmark:</label>
                                             <div class="col-sm-4">
-                                                <input class="form-control input-sm" type="text" name="landmark" ng-model="$parent.outputData.beeUser.landmark">
+                                                <input class="form-control input-sm" type="text" name="landmark" ng-model="outputData.beeUser.landmark">
                                             </div>
                                         </div>
                                         <div class="form-group col-sm-12">
                                             <label class="col-sm-3 control-label" for="message">Message:</label>
                                             <div class="col-sm-4">
-                                                <textarea class="form-control input-sm" name="message" ng-model="$parent.outputData.beeUser.message"></textarea>
+                                                <textarea class="form-control input-sm" name="message" ng-model="outputData.beeUser.message"></textarea>
                                             </div>
                                         </div>
                                         <div class="form-group col-sm-12">
                                             <label class="col-sm-3 control-label" for="contactPreference">Contact Preference:</label>
                                             <div class="col-sm-4">
-                                                <input type="radio" name="contactPreference" value="1" ng-model="$parent.outputData.beeUser.contactPreference">Phone
-                                                <input type="radio" name="contactPreference" value="2" ng-model="$parent.outputData.beeUser.contactPreference">Email
+                                                <input type="radio" name="contactPreference" value="1" ng-model="outputData.beeUser.contactPreference">Phone
+                                                <input type="radio" name="contactPreference" value="2" ng-model="outputData.beeUser.contactPreference">Email
                                             </div>
                                         </div>
                                         <div class="form-group col-sm-12">
                                             <label class="col-sm-3 control-label" for="textNotifications">Text Notifications:</label>
                                             <div class="col-sm-4">
-                                                <input type="checkbox" name="textNotifications" ng-model="$parent.outputData.beeUser.textNotifications">
+                                                <input type="checkbox" name="textNotifications" ng-model="outputData.beeUser.textNotifications">
                                             </div>
                                         </div>
                                         <div class="form-group col-sm-12">
                                             <label class="col-sm-3 control-label" for="paymentMode">Payment Mode:</label>
                                             <div class="col-sm-4">
-                                                <input type="radio" name="paymentMode" value="1" ng-model="$parent.outputData.beeUser.paymentMode">Cash
-                                                <input type="radio" name="paymentMode" value="2" ng-model="$parent.outputData.beeUser.paymentMode">Credit Card
+                                                <input type="radio" name="paymentMode" value="1" ng-model="outputData.beeUser.paymentMode">Cash
+                                                <input type="radio" name="paymentMode" value="2" ng-model="outputData.beeUser.paymentMode">Credit Card
                                             </div>
                                         </div>
                                         <span class="pull-right">
-                                            <a href="#selTime"><button name="prevToProfile" ng-disabled="vehCountForm.vehCount.$error.required" ng-click="$parent.currentStep=3;" class="btn btn-primary btn-sm">Previous</button></a>
-                                            <a href="#finish"><button name="saveProfile" ng-click="$parent.currentStep=5;$parent.saveServiceRequest();" class="btn btn-primary btn-sm">Order Now</button></a>
+                                            <a href="#"><button name="prevToProfile" ng-disabled="vehCountForm.vehCount.$error.required" ng-click="currentStep=3;" class="btn btn-primary btn-sm">Previous</button></a>
+                                            <a href="#"><button name="saveProfile" ng-click="currentStep=5;saveServiceRequest();" class="btn btn-primary btn-sm">Order Now</button></a>
                                         </span>
                                     </div>
-                                </script>
-                                <script type="text/ng-template" id="finish.htm">
+                                </div>
+                                <div ng-show="currentStep==5">
                                     Your service request has been registered successfully. Find below the details.
-                                </script>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -233,6 +279,10 @@
         </div>
 
 <script>
+
+
+
+
 /*
 window.onerror = function(errorMsg) {
 	$('#console').html($('#console').html()+'<br>'+errorMsg)
