@@ -12,25 +12,18 @@ namespace BeeCarService.Data
     using System;
     using System.Collections.Generic;
     
-    public partial class ServiceType
+    public partial class Landmark
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public ServiceType()
+        public Landmark()
         {
-            this.AddOns = new HashSet<AddOn>();
-            this.ServiceRequestVehicles = new HashSet<ServiceRequestVehicle>();
+            this.BeeUsers = new HashSet<BeeUser>();
         }
     
         public int ID { get; set; }
-        public string ServiceType1 { get; set; }
-        public int VehicleClassID { get; set; }
-        public Nullable<decimal> Cost { get; set; }
-        public Nullable<int> Duration { get; set; }
+        public string LandmarkLocation { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AddOn> AddOns { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ServiceRequestVehicle> ServiceRequestVehicles { get; set; }
-        public virtual VehicleClass VehicleClass { get; set; }
+        public virtual ICollection<BeeUser> BeeUsers { get; set; }
     }
 }

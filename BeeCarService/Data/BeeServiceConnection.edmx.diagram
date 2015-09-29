@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="5ed0ba1b47fe4df88e0066efd7c9c2f0" Name="Diagram1" ZoomLevel="47">
+        <EntityTypeShape EntityType="BeeServiceModel.AddOn" Width="1.5" PointX="7.5" PointY="8.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="BeeServiceModel.BeeUser" Width="1.5" PointX="3" PointY="11.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="BeeServiceModel.Landmark" Width="1.5" PointX="0.75" PointY="12.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="BeeServiceModel.ServiceAddOn" Width="1.5" PointX="9.75" PointY="6.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="BeeServiceModel.ServiceRequest" Width="1.5" PointX="5.25" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="BeeServiceModel.ServiceRequestVehicle" Width="1.5" PointX="7.5" PointY="4.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="BeeServiceModel.ServiceType" Width="1.5" PointX="5.25" PointY="8.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="BeeServiceModel.sysdiagram" Width="1.5" PointX="2.75" PointY="4.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="BeeServiceModel.VehicleClass" Width="1.5" PointX="3" PointY="8.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="BeeServiceModel.VehicleType" Width="1.5" PointX="0.75" PointY="5.25" IsExpanded="true" />
+        <AssociationConnector Association="BeeServiceModel.FK_AddOn_ServiceType" ManuallyRouted="false" />
+        <AssociationConnector Association="BeeServiceModel.FK_ServiceAddOn_AddOn" ManuallyRouted="false" />
+        <AssociationConnector Association="BeeServiceModel.FK_BeeUser_Landmark" ManuallyRouted="false" />
+        <AssociationConnector Association="BeeServiceModel.FK_ServiceRequest_BeeUser" ManuallyRouted="false" />
+        <AssociationConnector Association="BeeServiceModel.FK_ServiceAddOn_ServiceRequestVehicle" ManuallyRouted="false" />
+        <AssociationConnector Association="BeeServiceModel.FK_ServiceRequestVehicle_ServiceRequest" ManuallyRouted="false" />
+        <AssociationConnector Association="BeeServiceModel.FK_ServiceRequestVehicle_ServiceType" ManuallyRouted="false" />
+        <AssociationConnector Association="BeeServiceModel.FK_ServiceRequestVehicle_VehicleType" ManuallyRouted="false" />
+        <AssociationConnector Association="BeeServiceModel.FK_ServiceType_VehicleClass" ManuallyRouted="false" />
+        <AssociationConnector Association="BeeServiceModel.FK_VehicleClass_VehicleType" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="BeeServiceModel.ServiceTeam" Width="1.5" PointX="0.75" PointY="0.875" />
+        <AssociationConnector Association="BeeServiceModel.FK_ServiceRequest_ServiceTeam" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

@@ -21,6 +21,10 @@ namespace BeeCarService.Models
 
         public int VehicleCount { get; set; }
 
+        public int ServiceDuration { get; set; }
+
+        public short Status { get; set; }
+
         public BeeUser BeeUser { get; set; }
 
         public List<ServiceRequestVehicle> ServiceRequestVehicles { get; set; }

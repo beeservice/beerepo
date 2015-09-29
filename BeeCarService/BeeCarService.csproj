@@ -142,23 +142,29 @@
     <Content Include="Content\fullcalendar.css" />
     <Content Include="Content\fullcalendar.min.css" />
     <Content Include="Content\fullcalendar.print.css" />
+    <Content Include="Content\Images\bg_image_lg.jpg" />
+    <Content Include="Content\Images\bg_image_lg1.jpg" />
     <Content Include="Content\Images\Bike.jpg" />
     <Content Include="Content\Images\Car.jpg" />
+    <Content Include="Content\Images\car.png" />
+    <Content Include="Content\Images\car1.png" />
+    <Content Include="Content\Images\home.jpg" />
     <Content Include="Content\Images\logo.gif" />
     <Content Include="Content\Images\logo.jpg" />
+    <Content Include="Content\Images\logo.png" />
     <Content Include="Content\Images\Sedan.jpg" />
     <Content Include="Content\jquery.datetimepicker.css" />
     <Content Include="Content\Site.css" />
     <Content Include="Content\style.css" />
-    <Content Include="Data\BeeCarServiceConnection.Context.tt">
+    <Content Include="Data\BeeServiceConnection.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>BeeCarServiceConnection.edmx</DependentUpon>
-      <LastGenOutput>BeeCarServiceConnection.Context.cs</LastGenOutput>
+      <DependentUpon>BeeServiceConnection.edmx</DependentUpon>
+      <LastGenOutput>BeeServiceConnection.Context.cs</LastGenOutput>
     </Content>
-    <Content Include="Data\BeeCarServiceConnection.tt">
+    <Content Include="Data\BeeServiceConnection.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>BeeCarServiceConnection.edmx</DependentUpon>
-      <LastGenOutput>BeeCarServiceConnection.cs</LastGenOutput>
+      <DependentUpon>BeeServiceConnection.edmx</DependentUpon>
+      <LastGenOutput>BeeServiceConnection.cs</LastGenOutput>
     </Content>
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -169,12 +175,12 @@
     <Content Include="Scripts\bootbox.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <EntityDeploy Include="Data\BeeCarServiceConnection.edmx">
+    <EntityDeploy Include="Data\BeeServiceConnection.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>BeeCarServiceConnection.Designer.cs</LastGenOutput>
+      <LastGenOutput>BeeServiceConnection.Designer.cs</LastGenOutput>
     </EntityDeploy>
-    <Content Include="Data\BeeCarServiceConnection.edmx.diagram">
-      <DependentUpon>BeeCarServiceConnection.edmx</DependentUpon>
+    <Content Include="Data\BeeServiceConnection.edmx.diagram">
+      <DependentUpon>BeeServiceConnection.edmx</DependentUpon>
     </Content>
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\fullcalendar.min.js" />
@@ -189,63 +195,66 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\ServiceController.cs" />
     <Compile Include="Data\AddOn.cs">
-      <DependentUpon>BeeCarServiceConnection.tt</DependentUpon>
+      <DependentUpon>BeeServiceConnection.tt</DependentUpon>
     </Compile>
-    <Compile Include="Data\BeeCarServiceConnection.Context.cs">
+    <Compile Include="Data\BeeServiceConnection.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>BeeCarServiceConnection.Context.tt</DependentUpon>
+      <DependentUpon>BeeServiceConnection.Context.tt</DependentUpon>
     </Compile>
-    <Compile Include="Data\BeeCarServiceConnection.cs">
+    <Compile Include="Data\BeeServiceConnection.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>BeeCarServiceConnection.tt</DependentUpon>
+      <DependentUpon>BeeServiceConnection.tt</DependentUpon>
     </Compile>
-    <Compile Include="Data\BeeCarServiceConnection.Designer.cs">
+    <Compile Include="Data\BeeServiceConnection.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>BeeCarServiceConnection.edmx</DependentUpon>
+      <DependentUpon>BeeServiceConnection.edmx</DependentUpon>
     </Compile>
     <Compile Include="Data\BeeUser.cs">
-      <DependentUpon>BeeCarServiceConnection.tt</DependentUpon>
+      <DependentUpon>BeeServiceConnection.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Landmark.cs">
+      <DependentUpon>BeeServiceConnection.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\ServiceAddOn.cs">
-      <DependentUpon>BeeCarServiceConnection.tt</DependentUpon>
+      <DependentUpon>BeeServiceConnection.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\ServiceRequest.cs">
-      <DependentUpon>BeeCarServiceConnection.tt</DependentUpon>
+      <DependentUpon>BeeServiceConnection.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\ServiceRequestVehicle.cs">
-      <DependentUpon>BeeCarServiceConnection.tt</DependentUpon>
+      <DependentUpon>BeeServiceConnection.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\ServiceTeam.cs">
+      <DependentUpon>BeeServiceConnection.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\ServiceType.cs">
-      <DependentUpon>BeeCarServiceConnection.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Data\sp_helpdiagramdefinition_Result.cs">
-      <DependentUpon>BeeCarServiceConnection.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Data\sp_helpdiagrams_Result.cs">
-      <DependentUpon>BeeCarServiceConnection.tt</DependentUpon>
+      <DependentUpon>BeeServiceConnection.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\sysdiagram.cs">
-      <DependentUpon>BeeCarServiceConnection.tt</DependentUpon>
+      <DependentUpon>BeeServiceConnection.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\VehicleClass.cs">
-      <DependentUpon>BeeCarServiceConnection.tt</DependentUpon>
+      <DependentUpon>BeeServiceConnection.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\VehicleType.cs">
-      <DependentUpon>BeeCarServiceConnection.tt</DependentUpon>
+      <DependentUpon>BeeServiceConnection.tt</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\BeeUser.cs" />
+    <Compile Include="Models\Landmark.cs" />
     <Compile Include="Models\MasterData.cs" />
     <Compile Include="Models\ServiceAddon.cs" />
+    <Compile Include="Models\ServiceEvent.cs" />
     <Compile Include="Models\ServiceRequest.cs" />
     <Compile Include="Models\ServiceRequestVehicle.cs" />
     <Compile Include="Models\ServiceType.cs" />
     <Compile Include="Models\SRClientModel.cs" />
+    <Compile Include="Models\TeamCalendar.cs" />
     <Compile Include="Models\VechicleClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -24,9 +24,13 @@ namespace BeeCarService.Data
         public int CustomerID { get; set; }
         public System.DateTime ServiceStartTime { get; set; }
         public Nullable<System.DateTime> ServiceEndTime { get; set; }
+        public Nullable<int> ServiceDuration { get; set; }
+        public short Status { get; set; }
+        public Nullable<int> ServiceTeamID { get; set; }
     
         public virtual BeeUser BeeUser { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ServiceRequestVehicle> ServiceRequestVehicles { get; set; }
+        public virtual ServiceTeam ServiceTeam { get; set; }
     }
 }

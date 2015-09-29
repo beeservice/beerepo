@@ -6,23 +6,15 @@
 
 @using (Html.BeginForm("Home", "Service", FormMethod.Post))
 {
-    <div class="row">
-        <div class="col-md-2"></div>
-        <div class="col-md-8"><a href="/Service/Index" class="btn btn-primary pull-right">Request a Service</a></div>
-        <div class="col-md-2"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-5 col-md-offset-7">
+                <ul class="list-inline main_btns">
+                    <li><a href="/Service/listServiceRequests" class="btn btn-border btn-lg">MY Service Request</a></li>
+                    <li><a href="/Service/Index" class="btn btn-white btn-lg">Request a Service</a></li>
+                </ul>
+            </div>
         </div>
-
-    <div class="row">
-        <div class="col-md-2"></div>
-        <div class="col-md-8">
-            <img src="~/Content/Images/home.jpg" align="middle">
-        </div>
-        <div class="col-md-2"></div>
-    </div>
-    <div class="row">
-        <div class="col-md-2"></div>
-        <div class="col-md-8"><a href="/Service/listServiceRequests" class="btn btn-primary pull-right">My Service Requests</a></div>
-        <div class="col-md-2"></div>
     </div>
 }
 

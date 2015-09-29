@@ -11,5 +11,11 @@ namespace BeeCarService.Models
 
         public string ClientSR { get; set; }
 
+        public string Landmarks { get; set; }
+
+        public string CalendarEvents { get; set; }
+
+
+
     }
 }
