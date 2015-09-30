@@ -86,6 +86,17 @@ namespace BeeCarService.Controllers
             return View("Index", "", srClient);
         }
 
+        public ActionResult ManageServiceRequests()
+        {
+            if (Session["UserName"] == null || Session["UserName"].ToString() != "admin")
+            {
+                return RedirectToAction("Login");
+            }
+
+            return View("ManageServiceRequests", "", GetCalendarEvents());
+        }
+
+
         public ActionResult ListServiceRequests()
         {
             if (Session["LogedUserID"] == null  || Session["LogedUserID"].ToString() == "")
@@ -94,6 +105,15 @@ namespace BeeCarService.Controllers
             }
 
             return View("ListServiceRequests");
+        }
+
+        public ActionResult UpdateServiceRequestStatus(int serviceRequestId, short status)
+        {
+            DBModels.BeeServiceEntities2 context = new DBModels.BeeServiceEntities2();
+            Data.ServiceRequest serRequest = context.ServiceRequests.Find(serviceRequestId);
+            serRequest.Status = status;
+            context.SaveChanges();
+            return RedirectToAction("ManageServiceRequests");
         }
 
         public ActionResult CancelServiceRequest(int serviceRequestId)
@@ -127,7 +147,12 @@ namespace BeeCarService.Controllers
         public JsonResult GetServiceRequests()
         {
             DBModels.BeeServiceEntities2 context = new DBModels.BeeServiceEntities2();
-            var serviceRequests = context.ServiceRequests;
+            var serviceRequests = from ServiceRequest in context.ServiceRequests select ServiceRequest;
+            if (Session["UserName"].ToString()!="admin")
+            {
+                int customerID = Convert.ToInt32(Session["CustomerID"]);
+                serviceRequests = serviceRequests.Where(a => a.CustomerID.Equals(customerID));
+            }
             List<ServiceRequest> lstServiceReqs = new List<ServiceRequest>();
             foreach (var serviceRequest in serviceRequests)
             {
@@ -173,12 +198,28 @@ namespace BeeCarService.Controllers
                     if (v != null)
                     {
                         Session["LogedUserID"] = v.Email.ToString();
+                        Session["CustomerID"] = v.Id.ToString();
                         Session["LogedUserFullname"] = v.Email.ToString();
-                        return RedirectToAction("ListServiceRequests");
+                        Session["UserName"] = v.Username.ToString();
+                        if (v.Username == "admin")
+                            return RedirectToAction("ManageServiceRequests");
+                        else
+                            return RedirectToAction("ListServiceRequests");
+
                     }
                 }
             }
             return View(u);
+        }
+
+        // GET: Login
+        public ActionResult LogOut()
+        {
+            Session["LogedUserID"] = "";
+            Session["CustomerID"] = "";
+            Session["LogedUserFullname"] = "";
+            Session["UserName"] = "";
+            return RedirectToAction("Home");
         }
 
         private string GetMasterData()
@@ -205,7 +246,7 @@ namespace BeeCarService.Controllers
 
                 foreach (var vehicleClass in vehicleClasses)
                 {
-                    var vClass = new VechicleClass() { ID = vehicleClass.ID, Name = vehicleClass.Class };
+                    var vClass = new VechicleClass() { ID = vehicleClass.ID, Name = vehicleClass.Class};
 
                     //Adding service types to master data
                     var serviceTypes = context.ServiceTypes.Where((e) => e.VehicleClassID == vehicleClass.ID);
@@ -329,16 +370,6 @@ namespace BeeCarService.Controllers
 
             serviceRequest.ServiceStartTime = SRequest.StartTime;
             serviceRequest.Status = 0; //Service request in pending state
-            /*            serviceRequest.BeeUser.Address = "my address";
-                                    serviceRequest.BeeUser.ContactPreference = 1;
-                                    serviceRequest.BeeUser.Email = "test@testmail.com"; //SRequest.BeeUser.Email;
-                                    serviceRequest.BeeUser.FullName = "My full name"; //SRequest.BeeUser.FullName;
-                                    serviceRequest.BeeUser.Landmark = "Landmark"; //SRequest.BeeUser.Landmark;
-                                    serviceRequest.BeeUser.Message = "Test2"; // SRequest.BeeUser.Message;
-                                    serviceRequest.BeeUser.Phone = "188299282287"; //SRequest.BeeUser.Phone;
-                                    serviceRequest.BeeUser.PaymentMode = 1; // SRequest.BeeUser.PaymentMode;
-                                    serviceRequest.BeeUser.TextNotifications = true; // SRequest.BeeUser.TextNotifications;
-                        */
             serviceRequest.BeeUser.Address = SRequest.BeeUser.Address;
             serviceRequest.BeeUser.ContactPreference = SRequest.BeeUser.ContactPreference;
             serviceRequest.BeeUser.Email = SRequest.BeeUser.Email;

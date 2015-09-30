@@ -10,7 +10,7 @@
         var serviceCalendarEvents = @Html.Raw(Model.CalendarEvents);
 </script>
 
-<div ng-app="service" class="container" ng-controller="MasterDataController as mdCtrl" ng-init="loadRequests()">
+<div ng-app="service" class="container full" ng-controller="MasterDataController as mdCtrl" ng-init="loadRequests()">
     <div class="row">
         <div class="col-md-8">
             <div class="panel panel-primary main-panel">
@@ -26,11 +26,10 @@
                 <div class="panel-body">
                     <div class="tab-content">
                         <div ng-show="currentStep==1" role="tabpanel" class="tab-pane active" id="vehicle-summary">
-                            <p class="lead">Vehicle Summary</p>
                             <form>
                                 <div class="form-group">
                                     <label for="numberOfVehicles">Please provide number of vehicles requiring service</label>
-                                    <input type="number" class="form-control" id="numberOfVehicles" name="vehCount" ng-model="vehicleCount" placeholder="Number Of Vehicles" required>
+                                    <input type="number" class="form-control" id="numberOfVehicles" name="vehCount" ng-model="vehicleCount" min="1" max="5" placeholder="Number Of Vehicles" required>
                                     <span style="color:red" ng-show="vehCountForm.vehCount.$error.required">Vehicle count is required.</span>
                                 </div>
                                 <span class="pull-right">
@@ -40,38 +39,37 @@
                         </div>
 
                         <div ng-show="currentStep==2">
-                            <p class="lead">Select Service</p>
-                            <div ng-repeat="requestData in outputData.serviceRequestVehicles" class="well table-bordered" style="font-size:12px">
+                            <div ng-repeat="requestData in outputData.serviceRequestVehicles" class="well table-bordered selectVehicleText">
                                 Vehicle # {{$index+1}}
                                 <div class="well-sm table-bordered">
                                     <div class="row">
                                         <div class="col-xs-2">Choose One:</div>
-                                        <div class="col-xs-1" ng-repeat="vehicleType in masterData">
-                                            <input name="vehicleType_{{$index}}" type="radio" ng-value="vehicleType.id" ng-model="requestData.vehicleTypeID" ng-click="vehicleTypeSelected(requestData)" /><img src="/Content/Images/{{vehicleType.type}}.jpg" width=50 height=30 /> {{vehicleType.type}}
+                                        <div class="col-xs-3" ng-repeat="vehicleType in masterData">
+                                            <input name="vehicleType_{{$parent.$index}}_{{$index}}" type="radio" ng-value="vehicleType.id" ng-model="requestData.vehicleTypeID" ng-click="vehicleTypeSelected(requestData)" /><img src="/Content/Images/{{vehicleType.type}}.png"/> {{vehicleType.type}}
                                         </div>
                                     </div>
                                 </div>
                                 <div class="well-sm table-bordered" ng-show="requestData.showVehicleClasses">
                                     <div class="row">
                                         <div class="col-xs-2">Vehicle Type : </div>
-                                        <div class="col-xs-1" ng-repeat="vehClass in getSelectedVehType(requestData.vehicleTypeID).classes">
-                                            <input type="radio" name="vehicleClass_{{$parent.$index}}_{{$index}}" ng-value="vehClass.id" ng-model="requestData.vehicleClassID" ng-click="vehicleClassSelected(requestData)" /><img src="/Content/Images/{{vehicleClass.name}}.jpg" width=50 height=30 />{{vehClass.name}}
+                                        <div class="col-xs-3" ng-repeat="vehClass in getSelectedVehType(requestData.vehicleTypeID).classes">
+                                            <input type="radio" name="vehicleClass_{{$parent.$index}}_{{$index}}" ng-value="vehClass.id" ng-model="requestData.vehicleClassID" ng-click="vehicleClassSelected(requestData)" /><img src="~/Content/Images/{{vehClass.name}}.png"/>{{vehClass.name}}
                                         </div>
                                     </div>
                                 </div>
                                 <div class="well-sm table-bordered" ng-show="requestData.showVehicleServices">
                                     <div class="row">
                                         <div class="col-xs-2">Service Type : </div>
-                                        <div class="col-xs-1" ng-repeat="vehService in getSelectedVehClass(requestData.vehicleTypeID,requestData.vehicleClassID).services">
-                                            <input type="radio" name="vehService_{{$parent.$index}}_{{$index}}" ng-value="vehService.id" ng-model="requestData.serviceTypeID" ng-click="vehicleServiceSelected(requestData)">{{vehService.name}}
+                                        <div class="col-xs-3" ng-repeat="vehService in getSelectedVehClass(requestData.vehicleTypeID,requestData.vehicleClassID).services">
+                                            <input type="radio" name="vehService_{{$parent.$index}}_{{$index}}" ng-value="vehService.id" ng-model="requestData.serviceTypeID" ng-click="vehicleServiceSelected(requestData)"><img src="~/Content/Images/car_wash.png"/>{{vehService.name}}
                                         </div>
                                     </div>
                                 </div>
                                 <div class="well-sm table-bordered" ng-show="requestData.showVehicleAddons && requestData.serviceTypeID != undefined && requestData.serviceTypeID != 0">
                                     <div class="row">
                                         <div class="col-xs-2">Add On : </div>
-                                        <div class="col-xs-1" ng-repeat="vehAddon in getSelectedVehServiceType(requestData.vehicleTypeID,requestData.vehicleClassID,requestData.serviceTypeID).addons">
-                                            <input type="checkbox" name="vehAddon_{{$parent.$index}}_{{$index}}" value={{vehAddon.id}} ng-checked="{{requestData.vehicleAddonIDs.indexOf(vehAddon.id) > -1}}" ng-click="toggleSelection(requestData, vehAddon.id)">{{vehAddon.name}}
+                                        <div class="col-xs-3" ng-repeat="vehAddon in getSelectedVehServiceType(requestData.vehicleTypeID,requestData.vehicleClassID,requestData.serviceTypeID).addons">
+                                            <input type="checkbox" name="vehAddon_{{$parent.$index}}_{{$index}}" value={{vehAddon.id}} ng-checked="{{requestData.vehicleAddonIDs.indexOf(vehAddon.id) > -1}}" ng-click="toggleSelection(requestData, vehAddon.id)"><img src="~/Content/Images/car_wash.png" />{{vehAddon.name}}
                                         </div>
                                     </div>
                                 </div>
@@ -83,8 +81,14 @@
                         </div>
 
                         <div ng-show="currentStep==3">
-                            <h4>Choose Date/Time</h4>
-                            <div id='calendar'></div>
+                            <div class="row">
+                                <div class="col-sm-1"></div>
+                                <div class="col-sm-10">
+                                    <h4>Choose Date/Time</h4>
+                                    <div id='calendar'></div>
+                                </div>
+                                <div class="col-sm-1"></div>
+                            </div>
                             <span class="pull-right">
                                 <button name="prevToTime" ng-click="currentStep=2;" class="btn btn-primary btn-sm">Previous</button>
                                 <button name="saveTime" ng-click="currentStep=4;" class="btn btn-primary btn-sm">Next</button>
@@ -169,7 +173,38 @@
                             </div>
                         </div>
                         <div ng-show="currentStep==5">
-                            Your service request has been registered successfully. Find below the details.
+                            <div class="row">
+                                <div class="alert alert-success">
+                                    Your service request has been registered <strong>successfully</strong>. Find below the details.
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="row panel-heading" style="background-color:lightgray">
+                                        <div class="col-xs-2">Vehicle type</div>
+                                        <div class="col-xs-1">Class</div>
+                                        <div class="col-xs-4">Service</div>
+                                        <div class="col-xs-4">Addons</div>
+                                        <div class="col-xs-1">Total Price</div>
+                                    </div>
+                                    <div class="row" ng-repeat="requestData in outputData.serviceRequestVehicles">
+                                        <div class="col-xs-2">{{getSelectedVehType(requestData.vehicleTypeID).type}}</div>
+                                        <div class="col-xs-1">{{getSelectedVehClass(requestData.vehicleTypeID,requestData.vehicleClassID).name}}</div>
+                                        <div class="col-xs-4">{{getSelectedVehServiceType(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID).name}} ({{getSelectedVehServiceType(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID).cost}} KD)</div>
+                                        <div class="col-xs-4">
+                                            <div class="row" ng-repeat="serviceAddonID in requestData.vehicleAddonIDs">
+                                                <div class="col-xs-12">{{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).name}} ({{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).cost}}KD)</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-1">{{getCostForRequest(requestData)}} KD</div>
+                                    </div>
+                                    <div class="row panel-footer">
+                                        <div class="col-xs-7"></div>
+                                        <div class="col-xs-4"><strong>Total cost :</strong></div>
+                                        <div class="col-xs-1"><strong>{{calculateTotalCost()}} KD</strong></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -186,25 +221,28 @@
                     </div>
                     <div ng-show="outputData.serviceRequestVehicles.length>0">
                         <div class="row">
-                            <div class="col-md-4">Veh. Type</div>
+                            <div class="col-md-4">Vehicle</div>
                             <div class="col-md-5">Service</div>
-                            <div class="col-md-3">Price</div>
+                            <div class="col-md-3">Cost</div>
                         </div>
-                        <div class="row" ng-repeat="requestData in outputData.serviceRequestVehicles">
-                            <div class="col-md-4">{{getSelectedVehType(requestData.vehicleTypeID).type}}</div>
-                            <div class="col-md-5">
-                                <p ng-if="requestData.serviceTypeID != undefined && requestData.serviceTypeID != 0">{{getSelectedVehServiceType(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID).name}}</p>
-                                <ul>
-                                    <li ng-repeat="serviceAddonID in requestData.vehicleAddonIDs">
-                                        {{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).name}} ({{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).cost}}KD)
-                                    </li>
-                                </ul>
+                        <div ng-repeat="requestData in outputData.serviceRequestVehicles">
+                            <div class="row">
+                                <div class="col-xs-4">{{getSelectedVehType(requestData.vehicleTypeID).type}}</div>
+                                <div class="col-xs-5">
+                                    <div ng-if="requestData.serviceTypeID != undefined && requestData.serviceTypeID != 0">{{getSelectedVehServiceType(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID).name}}</div>
+                                    <ul class="sublist">
+                                        <li ng-repeat="serviceAddonID in requestData.vehicleAddonIDs">
+                                            {{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).name}} ({{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).cost}}KD)
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-xs-3 ttlprice subtotal">{{getCostForRequest(requestData)}} KD</div>
                             </div>
-                            <div class="col-md-3 ttlprice subtotal">{{getCostForRequest(requestData)}} KD</div>
+                            <hr />
                         </div>
                         <div class="row">
-                            <div class="col-md-9">Total  : </div>
-                            <div class="col-md-3 ttlprice grandtotal">{{calculateTotalCost()}} KD</div>
+                            <div class="col-xs-9">Total  : </div>
+                            <div class="col-xs-3 ttlprice grandtotal">{{calculateTotalCost()}} KD</div>
                         </div>
                     </div>
                 </div>

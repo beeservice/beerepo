@@ -144,15 +144,23 @@
     <Content Include="Content\fullcalendar.print.css" />
     <Content Include="Content\Images\bg_image_lg.jpg" />
     <Content Include="Content\Images\bg_image_lg1.jpg" />
+    <Content Include="Content\Images\bg_image_lg2.jpg" />
+    <Content Include="Content\Images\bg_image_lg3.jpg" />
     <Content Include="Content\Images\Bike.jpg" />
     <Content Include="Content\Images\Car.jpg" />
     <Content Include="Content\Images\car.png" />
     <Content Include="Content\Images\car1.png" />
+    <Content Include="Content\Images\carmain.png" />
+    <Content Include="Content\Images\Hatchback.jpg" />
     <Content Include="Content\Images\home.jpg" />
     <Content Include="Content\Images\logo.gif" />
     <Content Include="Content\Images\logo.jpg" />
     <Content Include="Content\Images\logo.png" />
     <Content Include="Content\Images\Sedan.jpg" />
+    <Content Include="Content\Images\Sedan.png" />
+    <Content Include="Content\Images\Service.jpg" />
+    <Content Include="Content\Images\SUV.jpg" />
+    <Content Include="Content\Images\SUV.png" />
     <Content Include="Content\jquery.datetimepicker.css" />
     <Content Include="Content\Site.css" />
     <Content Include="Content\style.css" />
@@ -273,6 +281,7 @@
     <Content Include="Views\Service\Home.cshtml" />
     <Content Include="Views\Service\ServiceDetails.cshtml" />
     <Content Include="Views\Service\ListServiceRequests.cshtml" />
+    <Content Include="Views\Service\ManageServiceRequests.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
