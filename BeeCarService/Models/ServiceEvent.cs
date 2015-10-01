@@ -9,9 +9,9 @@ namespace BeeCarService.Models
     {
         public int ServiceRequestID { get; set; }
 
-        public DateTime StartTime { get; set; }
+        public DateTime Start { get; set; }
 
-        public DateTime EndTime { get; set; }
+        public DateTime End { get; set; }
 
         public int Duration { get; set; }
 

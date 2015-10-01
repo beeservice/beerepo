@@ -314,14 +314,14 @@ namespace BeeCarService.Controllers
                 {
                     ServiceEvent sEvent = new ServiceEvent();
                     sEvent.ServiceRequestID = serviceRequest.ID;
-                    sEvent.StartTime = serviceRequest.ServiceStartTime;
+                    sEvent.Start = serviceRequest.ServiceStartTime;
                     if (serviceRequest.ServiceEndTime == null)
                     {
-                        sEvent.EndTime = serviceRequest.ServiceStartTime.AddMinutes((int)serviceRequest.ServiceDuration);
+                        sEvent.End = serviceRequest.ServiceStartTime.AddMinutes((int)serviceRequest.ServiceDuration);
                     }
                     else
                     {
-                        sEvent.EndTime = (DateTime)serviceRequest.ServiceEndTime;
+                        sEvent.End = (DateTime)serviceRequest.ServiceEndTime;
                     }
                     sEvent.Duration= (int) serviceRequest.ServiceDuration;
 
@@ -415,6 +415,11 @@ namespace BeeCarService.Controllers
                 //sendMail(BuildServiceDetails(serviceRequest.ID));
 
             return View();
+        }
+
+        private bool IsServiceSlotAvailable(DateTime startTime, short duration)
+        {
+            return false;
         }
 
         private void sendMail(string bodyText)

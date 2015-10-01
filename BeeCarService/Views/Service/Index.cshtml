@@ -10,7 +10,7 @@
         var serviceCalendarEvents = @Html.Raw(Model.CalendarEvents);
 </script>
 
-<div ng-app="service" class="container full" ng-controller="MasterDataController as mdCtrl" ng-init="loadRequests()">
+<div ng-app="service" class="container mainScreen" ng-controller="MasterDataController as mdCtrl" ng-init="loadRequests()">
     <div class="row">
         <div class="col-md-8">
             <div class="panel panel-primary main-panel">
@@ -90,14 +90,15 @@
                                 <div class="col-sm-1"></div>
                             </div>
                             <span class="pull-right">
-                                <button name="prevToTime" ng-click="currentStep=2;" class="btn btn-primary btn-sm">Previous</button>
-                                <button name="saveTime" ng-click="currentStep=4;" class="btn btn-primary btn-sm">Next</button>
+                                <button name="prevToTime" ng-show="outputData.id==undefined" ng-click="currentStep=2;" class="btn btn-primary btn-sm">Previous</button>
+                                <button name="saveTime" ng-show="outputData.id==undefined" ng-click="currentStep=4;" class="btn btn-primary btn-sm">Next</button>
+                                <button name="reschedule" ng-show="outputData.id>0" ng-click="currentStep=5;saveServiceRequest();" class="btn btn-primary btn-sm">Reschedule</button>
                             </span>
                         </div>
                         <div ng-show="currentStep==4">
                             <div ng-form name="profileForm" role="form">
                                 <div class="form-group col-sm-12" ng-class="{ 'has-error': profileForm.fullName.$touched && profileForm.fullName.$invalid }">
-                                    <label class="col-sm-3 control-label" for="fullName">Name{{outputData.beeUser.fullName}}:</label>
+                                    <label class="col-sm-3 control-label" for="fullName">Name:</label>
                                     <div class="col-sm-4">
                                         <input class="form-control input-sm" type="text" name="fullName" ng-model="outputData.beeUser.fullName" required>
                                     </div>

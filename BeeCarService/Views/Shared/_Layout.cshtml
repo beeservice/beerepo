@@ -48,54 +48,55 @@
 
 </head>
 <body class="full">
-    <nav class="navbar navbar-default navbar-fixed-top">
-        <div class="container">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="#">
-                    <img alt="Brand" src="/Content/images/logo.png">
-                </a>
-            </div>
-
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
-                    <li><a href="/service/home">Home <span class="sr-only">(current)</span></a></li>
-                    <li><a href="#">Work</a></li>
-                    <li><a href="#">Clients</a></li>
-                    <li><a href="#">Contact</a></li>
-                    <li><a href="~/Service/ManageServiceRequests">Admin</a></li>
-                    <li><a href="~/Service/logOut">Logout</a></li>
-                </ul>
-            </div><!-- /.navbar-collapse -->
-        </div><!-- /.container-fluid -->
-    </nav>
-
-    @RenderBody()
-
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-xs-12 col-md-4 text-left">
-                    <span class="copyright">All Copy rights reserved &copy; beeprotection.com</span>
+    <div class="fullContent">
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">
+                        <img alt="Brand" src="/Content/images/logo.png">
+                    </a>
                 </div>
-                <div class="col-xs-12 col-md-8 text-right">
-                    <ul class="list-inline quicklinks">
-                        <li><a href="#">Reschedule a Service</a></li>
-                        <li><a href="#">Cancle a Service</a></li>
-                        <li><a href="#">Contact Us</a></li>
-                        <li><a href="#">Provide your feedback</a></li>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li><a href="/service/home">Home <span class="sr-only">(current)</span></a></li>
+                        <li><a href="#">Work</a></li>
+                        <li><a href="#">Clients</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="~/Service/ManageServiceRequests">Admin</a></li>
+                        <li><a href="~/Service/logOut">Logout</a></li>
                     </ul>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
+
+        @RenderBody()
+
+        <footer class="footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 col-md-4 text-left">
+                        <span class="copyright">All Copy rights reserved &copy; beeprotection.com</span>
+                    </div>
+                    <div class="col-xs-12 col-md-8 text-right">
+                        <ul class="list-inline quicklinks">
+                            <li><a href="/Service/listServiceRequests">Reschedule a Service</a></li>
+                            <li><a href="#">Cancle a Service</a></li>
+                            <li><a href="#">Contact Us</a></li>
+                            <li><a href="#">Provide your feedback</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </div>
-    </footer>
-
+        </footer>
+    </div>
 </body>
 </html>
