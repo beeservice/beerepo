@@ -32,6 +32,8 @@ namespace BeeCarService.Controllers
                 objClientSR.ID = SRID;
                 objClientSR.CustomerID = objDBSR.CustomerID;
                 objClientSR.StartTime = objDBSR.ServiceStartTime;
+                objClientSR.ServiceDuration = (int)objDBSR.ServiceDuration;
+                objClientSR.EndTime = objDBSR.ServiceStartTime.AddMinutes((int)objClientSR.ServiceDuration);
                 objClientSR.Status = objDBSR.Status;
                 objClientSR.BeeUser = new BeeUser();
                 objClientSR.BeeUser.Id = objDBSR.BeeUser.Id;

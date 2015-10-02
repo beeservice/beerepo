@@ -11,27 +11,29 @@
     // this is for prevent CSRF attack
     @Html.ValidationSummary(true)
 
-
-<div ng-app="service" ng-controller="LoginController as loginCtrl">
-    <div class="panel panel-default" style="max-width:400px;margin-left:auto; margin-right:auto;">
-        <div class="panel-heading">
-            <strong class="panel-title">Login</strong>
-        </div>
-        <div class="panel-body">
-            <form name="loginForm" action="/Service/Login" method="post">
-                <div class="form-group">
-                    <input id="inputEmail" type="text" name="Username" class="form-control" placeholder="Username" ng-model="username" required="" />
+    <div class="main_container">
+        <div class="login_scrn" ng-app="service" ng-controller="LoginController as loginCtrl">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="well login-box">
+                        <form name="loginForm" action="/Service/Login" method="post">
+                            <div class="form-group">
+                                <label for="username">E-mail ID</label>
+                                <input id="inputEmail" type="text" name="Username" class="form-control" placeholder="Username" ng-model="username" required="" />
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input id="inputPassword" type="password" name="Password" class="form-control" placeholder="Password" ng-model="password" required="" />
+                            </div>
+                            <div class="form-group">
+                                <input id="btnSubmit" value="Login" type="submit" class="btn btn-primary form-control" />
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <input id="inputPassword" type="password" name="Password" class="form-control" placeholder="Password" ng-model="password" required="" />
-                </div>
-                <div class="form-group">
-                    <input id="btnSubmit" value="Login" type="submit" class="btn btn-primary form-control" />
-                </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
 
 
 }

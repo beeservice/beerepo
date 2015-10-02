@@ -10,199 +10,193 @@
         var serviceCalendarEvents = @Html.Raw(Model.CalendarEvents);
 </script>
 
-<div ng-app="service" class="container mainScreen" ng-controller="MasterDataController as mdCtrl" ng-init="loadRequests()">
-    <div class="row">
-        <div class="col-md-8">
-            <div class="panel panel-primary main-panel">
-                <div class="panel-heading">
-                    <ul class="nav nav-tabs nav-justified" role="tablist">
-                        <li role="presentation" class="{{currentStep==1 ? 'active' : ''}}"><a aria-controls="vehicle-summary" role="tab">Vehicle Summary</a></li>
-                        <li role="presentation" class="{{currentStep==2 ? 'active' : ''}}"><a aria-controls="select-service" role="tab">Select Service(s)</a></li>
-                        <li role="presentation" class="{{currentStep==3 ? 'active' : ''}}"><a aria-controls="select-time" role="tab">Select Time</a></li>
-                        <li role="presentation" class="{{currentStep==4 ? 'active' : ''}}"><a aria-controls="profile" role="tab">Profile</a></li>
-                        <li role="presentation" class="{{currentStep==5 ? 'active' : ''}}"><a aria-controls="finish" role="tab">Finish</a></li>
-                    </ul>
-                </div>
-                <div class="panel-body">
-                    <div class="tab-content">
-                        <div ng-show="currentStep==1" role="tabpanel" class="tab-pane active" id="vehicle-summary">
-                            <form>
-                                <div class="form-group">
-                                    <label for="numberOfVehicles">Please provide number of vehicles requiring service</label>
-                                    <input type="number" class="form-control" id="numberOfVehicles" name="vehCount" ng-model="vehicleCount" min="1" max="5" placeholder="Number Of Vehicles" required>
-                                    <span style="color:red" ng-show="vehCountForm.vehCount.$error.required">Vehicle count is required.</span>
-                                </div>
-                                <span class="pull-right">
-                                    <button name="buildRequests" ng-disabled="vehCountForm.vehCount.$error.required" ng-click="buildRequests(); currentStep=2;" class="btn btn-primary btn-sm">Next</button>
-                                </span>
-                            </form>
-                        </div>
+<div class="main_container">
+    <div ng-app="service" class="service_selection" ng-controller="MasterDataController as mdCtrl" ng-init="loadRequests()">
+        <div class="row">
+            <div class="col-sm-8">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <ul class="nav nav-tabs tabbable" role="tablist">
+                            <li role="presentation" class="{{currentStep==1 ? 'active' : ''}}"><a aria-controls="vehicle-summary" role="tab">Vehicle Summary</a></li>
+                            <li role="presentation" class="{{currentStep==2 ? 'active' : ''}}"><a aria-controls="select-service" role="tab">Select Service(s)</a></li>
+                            <li role="presentation" class="{{currentStep==3 ? 'active' : ''}}"><a aria-controls="select-time" role="tab">Select Time</a></li>
+                            <li role="presentation" class="{{currentStep==4 ? 'active' : ''}}"><a aria-controls="profile" role="tab">Profile</a></li>
+                            <li role="presentation" class="{{currentStep==5 ? 'active' : ''}}"><a aria-controls="finish" role="tab">Finish</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel-body">
+                        <div class="tab-content">
+                            <div ng-show="currentStep==1" role="tabpanel" class="tab-pane fade in active" id="vehicle-summary">
+                                <form>
+                                    <div class="form-group">
+                                        <label for="numberOfVehicles">Please provide number of vehicles requiring service</label>
+                                        <input type="number" class="form-control" id="numberOfVehicles" name="vehCount" ng-model="vehicleCount" min="1" max="5" placeholder="Number Of Vehicles" required>
+                                        <span style="color:red" ng-show="vehCountForm.vehCount.$error.required">Vehicle count is required.</span>
+                                    </div>
+                                    <span class="pull-right">
+                                        <button name="buildRequests" ng-disabled="vehCountForm.vehCount.$error.required" ng-click="buildRequests(); currentStep=2;" class="btn btn-primary btn-sm">Next</button>
+                                    </span>
+                                </form>
+                            </div>
 
-                        <div ng-show="currentStep==2">
-                            <div ng-repeat="requestData in outputData.serviceRequestVehicles" class="well table-bordered selectVehicleText">
-                                Vehicle # {{$index+1}}
-                                <div class="well-sm table-bordered">
-                                    <div class="row">
-                                        <div class="col-xs-2">Choose One:</div>
+                            <div ng-show="currentStep==2">
+                                <div ng-repeat="requestData in outputData.serviceRequestVehicles" class="services_template">
+                                    Vehicle # {{$index+1}}
+                                    <div class="row sbox">
+                                        <div class="col-xs-3">Choose One:</div>
                                         <div class="col-xs-3" ng-repeat="vehicleType in masterData">
-                                            <input name="vehicleType_{{$parent.$index}}_{{$index}}" type="radio" ng-value="vehicleType.id" ng-model="requestData.vehicleTypeID" ng-click="vehicleTypeSelected(requestData)" /><img src="/Content/Images/{{vehicleType.type}}.png"/> {{vehicleType.type}}
+                                            <input name="vehicleType_{{$parent.$index}}_{{$index}}" type="radio" ng-value="vehicleType.id" ng-model="requestData.vehicleTypeID" ng-click="vehicleTypeSelected(requestData)" /><img src="/Content/Images/{{vehicleType.type}}.png" /> {{vehicleType.type}}
                                         </div>
                                     </div>
-                                </div>
-                                <div class="well-sm table-bordered" ng-show="requestData.showVehicleClasses">
-                                    <div class="row">
-                                        <div class="col-xs-2">Vehicle Type : </div>
+                                    <div class="row sbox" ng-show="requestData.showVehicleClasses">
+                                        <div class="col-xs-3">Vehicle Type : </div>
                                         <div class="col-xs-3" ng-repeat="vehClass in getSelectedVehType(requestData.vehicleTypeID).classes">
-                                            <input type="radio" name="vehicleClass_{{$parent.$index}}_{{$index}}" ng-value="vehClass.id" ng-model="requestData.vehicleClassID" ng-click="vehicleClassSelected(requestData)" /><img src="~/Content/Images/{{vehClass.name}}.png"/>{{vehClass.name}}
+                                            <input type="radio" name="vehicleClass_{{$parent.$index}}_{{$index}}" ng-value="vehClass.id" ng-model="requestData.vehicleClassID" ng-click="vehicleClassSelected(requestData)" /><img src="~/Content/Images/{{vehClass.name}}.png" />{{vehClass.name}}
                                         </div>
                                     </div>
-                                </div>
-                                <div class="well-sm table-bordered" ng-show="requestData.showVehicleServices">
-                                    <div class="row">
-                                        <div class="col-xs-2">Service Type : </div>
+                                    <div class="row sbox" ng-show="requestData.showVehicleServices">
+                                        <div class="col-xs-3">Service Type : </div>
                                         <div class="col-xs-3" ng-repeat="vehService in getSelectedVehClass(requestData.vehicleTypeID,requestData.vehicleClassID).services">
-                                            <input type="radio" name="vehService_{{$parent.$index}}_{{$index}}" ng-value="vehService.id" ng-model="requestData.serviceTypeID" ng-click="vehicleServiceSelected(requestData)"><img src="~/Content/Images/car_wash.png"/>{{vehService.name}}
+                                            <input type="radio" name="vehService_{{$parent.$index}}_{{$index}}" ng-value="vehService.id" ng-model="requestData.serviceTypeID" ng-click="vehicleServiceSelected(requestData)"><img src="~/Content/Images/car_wash.png" />{{vehService.name}}
                                         </div>
                                     </div>
-                                </div>
-                                <div class="well-sm table-bordered" ng-show="requestData.showVehicleAddons && requestData.serviceTypeID != undefined && requestData.serviceTypeID != 0">
-                                    <div class="row">
-                                        <div class="col-xs-2">Add On : </div>
+                                    <div class="row sbox" ng-show="requestData.showVehicleAddons && requestData.serviceTypeID != undefined && requestData.serviceTypeID != 0">
+                                        <div class="col-xs-3">Add On : </div>
                                         <div class="col-xs-3" ng-repeat="vehAddon in getSelectedVehServiceType(requestData.vehicleTypeID,requestData.vehicleClassID,requestData.serviceTypeID).addons">
                                             <input type="checkbox" name="vehAddon_{{$parent.$index}}_{{$index}}" value={{vehAddon.id}} ng-checked="{{requestData.vehicleAddonIDs.indexOf(vehAddon.id) > -1}}" ng-click="toggleSelection(requestData, vehAddon.id)"><img src="~/Content/Images/car_wash.png" />{{vehAddon.name}}
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <span class="pull-right">
-                                <button name="prevToService" ng-click="currentStep=1;" class="btn btn-primary btn-sm">Previous</button>
-                                <button name="saveService" ng-click="calculateTotalDuration(); findEmptySlots(); eventData={}; currentStep=3;" class="btn btn-primary btn-sm">Next</button>
-                            </span>
-                        </div>
-
-                        <div ng-show="currentStep==3">
-                            <div class="row">
-                                <div class="col-sm-1"></div>
-                                <div class="col-sm-10">
-                                    <h4>Choose Date/Time</h4>
-                                    <div id='calendar'></div>
-                                </div>
-                                <div class="col-sm-1"></div>
-                            </div>
-                            <span class="pull-right">
-                                <button name="prevToTime" ng-show="outputData.id==undefined" ng-click="currentStep=2;" class="btn btn-primary btn-sm">Previous</button>
-                                <button name="saveTime" ng-show="outputData.id==undefined" ng-click="currentStep=4;" class="btn btn-primary btn-sm">Next</button>
-                                <button name="reschedule" ng-show="outputData.id>0" ng-click="currentStep=5;saveServiceRequest();" class="btn btn-primary btn-sm">Reschedule</button>
-                            </span>
-                        </div>
-                        <div ng-show="currentStep==4">
-                            <div ng-form name="profileForm" role="form">
-                                <div class="form-group col-sm-12" ng-class="{ 'has-error': profileForm.fullName.$touched && profileForm.fullName.$invalid }">
-                                    <label class="col-sm-3 control-label" for="fullName">Name:</label>
-                                    <div class="col-sm-4">
-                                        <input class="form-control input-sm" type="text" name="fullName" ng-model="outputData.beeUser.fullName" required>
-                                    </div>
-                                    <div class="help-block" ng-messages="profileForm.fullName.$error" ng-if="profileForm.fullName.$touched">
-                                        <p ng-message="required">Name is required.</p>
-                                    </div>
-                                </div>
-
-                                <div class="form-group col-sm-12" ng-class="{ 'has-error': profileForm.address.$touched && profileForm.address.$invalid }">
-                                    <label class="col-sm-3 control-label" for="address">Address:</label>
-                                    <div class="col-sm-9">
-                                        <input class="form-control input-sm" type="text" name="address" ng-model="outputData.beeUser.address" required>
-                                    </div>
-                                    <div class="help-block col-sm-offset-3" ng-messages="profileForm.address.$error" ng-if="profileForm.address.$touched">
-                                        <p ng-message="required">Address is required.</p>
-                                    </div>
-                                </div>
-                                <div class="form-group col-sm-12" ng-class="{ 'has-error': profileForm.phone.$touched && profileForm.phone.$invalid }">
-                                    <label class="col-sm-3 control-label" for="phone">Phone number:</label>
-                                    <div class="col-sm-4">
-                                        <input class="form-control input-sm" type="text" name="phone" ng-model="outputData.beeUser.phone" required>
-                                    </div>
-                                    <div class="help-block" ng-messages="profileForm.phone.$error" ng-if="profileForm.phone.$touched">
-                                        <p ng-message="required">Phone number is required.</p>
-                                    </div>
-                                </div>
-                                <div class="form-group col-sm-12" ng-class="{ 'has-error': profileForm.email.$touched && profileForm.email.$invalid }">
-                                    <label class="col-sm-3 control-label" for="email">Email:</label>
-                                    <div class="col-sm-6">
-                                        <input class="form-control input-sm" type="email" name="email" ng-model="outputData.beeUser.email" required>
-                                    </div>
-                                    <div class="help-block" ng-messages="profileForm.email.$error" ng-if="profileForm.email.$touched">
-                                        <p ng-message="required">Email is required.</p>
-                                        <p ng-message="email">Please enter valid Email.</p>
-                                    </div>
-                                </div>
-                                <div class="form-group col-sm-12">
-                                    <label class="col-sm-3 control-label" for="landmark">Landmark:</label>
-                                    <div class="col-sm-4">
-                                        <select ng-model="selectedLandmark" ng-options="landmark.landmarkLocation for landmark in landmarkList"></select>
-                                    </div>
-                                </div>
-                                <div class="form-group col-sm-12">
-                                    <label class="col-sm-3 control-label" for="message">Message:</label>
-                                    <div class="col-sm-4">
-                                        <textarea class="form-control input-sm" name="message" ng-model="outputData.beeUser.message"></textarea>
-                                    </div>
-                                </div>
-                                <div class="form-group col-sm-12">
-                                    <label class="col-sm-3 control-label" for="contactPreference">Contact Preference:</label>
-                                    <div class="col-sm-4">
-                                        <input type="radio" name="contactPreference" value="1" ng-model="outputData.beeUser.contactPreference">Phone
-                                        <input type="radio" name="contactPreference" value="2" ng-model="outputData.beeUser.contactPreference">Email
-                                    </div>
-                                </div>
-                                <div class="form-group col-sm-12">
-                                    <label class="col-sm-3 control-label" for="textNotifications">Text Notifications:</label>
-                                    <div class="col-sm-4">
-                                        <input type="checkbox" name="textNotifications" ng-model="outputData.beeUser.textNotifications">
-                                    </div>
-                                </div>
-                                <div class="form-group col-sm-12">
-                                    <label class="col-sm-3 control-label" for="paymentMode">Payment Mode:</label>
-                                    <div class="col-sm-4">
-                                        <input type="radio" name="paymentMode" value="1" ng-model="outputData.beeUser.paymentMode">Cash
-                                        <input type="radio" name="paymentMode" value="2" ng-model="outputData.beeUser.paymentMode">Credit Card
-                                    </div>
-                                </div>
                                 <span class="pull-right">
-                                    <button name="prevToProfile" ng-disabled="vehCountForm.vehCount.$error.required" ng-click="showPop(); currentStep=3;" class="btn btn-primary btn-sm">Previous</button>
-                                    <button name="saveProfile" ng-click="currentStep=5;saveServiceRequest();" class="btn btn-primary btn-sm">Order Now</button>
+                                    <button name="prevToService" ng-click="currentStep=1;" class="btn btn-primary btn-sm">Previous</button>
+                                    <button name="saveService" ng-click="calculateTotalDuration(); findEmptySlots(); eventData={}; currentStep=3;" class="btn btn-primary btn-sm">Next</button>
                                 </span>
                             </div>
-                        </div>
-                        <div ng-show="currentStep==5">
-                            <div class="row">
-                                <div class="alert alert-success">
-                                    Your service request has been registered <strong>successfully</strong>. Find below the details.
+
+                            <div ng-show="currentStep==3">
+                                <div class="row">
+                                    <div class="col-sm-1"></div>
+                                    <div class="col-sm-10">
+                                        <h4>Choose Date/Time</h4>
+                                        <div id='calendar'></div>
+                                    </div>
+                                    <div class="col-sm-1"></div>
+                                </div>
+                                <span class="pull-right">
+                                    <button name="prevToTime" ng-show="outputData.id==undefined" ng-click="currentStep=2;" class="btn btn-primary btn-sm">Previous</button>
+                                    <button name="saveTime" ng-show="outputData.id==undefined" ng-click="currentStep=4;" class="btn btn-primary btn-sm">Next</button>
+                                    <button name="reschedule" ng-show="outputData.id>0" ng-click="currentStep=5;saveServiceRequest();" class="btn btn-primary btn-sm">Reschedule</button>
+                                </span>
+                            </div>
+                            <div ng-show="currentStep==4">
+                                <div ng-form name="profileForm" role="form">
+                                    <div class="form-group col-sm-12" ng-class="{ 'has-error': profileForm.fullName.$touched && profileForm.fullName.$invalid }">
+                                        <label class="col-sm-3 control-label" for="fullName">Name:</label>
+                                        <div class="col-sm-4">
+                                            <input class="form-control input-sm" type="text" name="fullName" ng-model="outputData.beeUser.fullName" required>
+                                        </div>
+                                        <div class="help-block" ng-messages="profileForm.fullName.$error" ng-if="profileForm.fullName.$touched">
+                                            <p ng-message="required">Name is required.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-sm-12" ng-class="{ 'has-error': profileForm.address.$touched && profileForm.address.$invalid }">
+                                        <label class="col-sm-3 control-label" for="address">Address:</label>
+                                        <div class="col-sm-9">
+                                            <input class="form-control input-sm" type="text" name="address" ng-model="outputData.beeUser.address" required>
+                                        </div>
+                                        <div class="help-block col-sm-offset-3" ng-messages="profileForm.address.$error" ng-if="profileForm.address.$touched">
+                                            <p ng-message="required">Address is required.</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12" ng-class="{ 'has-error': profileForm.phone.$touched && profileForm.phone.$invalid }">
+                                        <label class="col-sm-3 control-label" for="phone">Phone number:</label>
+                                        <div class="col-sm-4">
+                                            <input class="form-control input-sm" type="text" name="phone" ng-model="outputData.beeUser.phone" required>
+                                        </div>
+                                        <div class="help-block" ng-messages="profileForm.phone.$error" ng-if="profileForm.phone.$touched">
+                                            <p ng-message="required">Phone number is required.</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12" ng-class="{ 'has-error': profileForm.email.$touched && profileForm.email.$invalid }">
+                                        <label class="col-sm-3 control-label" for="email">Email:</label>
+                                        <div class="col-sm-6">
+                                            <input class="form-control input-sm" type="email" name="email" ng-model="outputData.beeUser.email" required>
+                                        </div>
+                                        <div class="help-block" ng-messages="profileForm.email.$error" ng-if="profileForm.email.$touched">
+                                            <p ng-message="required">Email is required.</p>
+                                            <p ng-message="email">Please enter valid Email.</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-sm-3 control-label" for="landmark">Landmark:</label>
+                                        <div class="col-sm-4">
+                                            <select ng-model="selectedLandmark" ng-options="landmark.landmarkLocation for landmark in landmarkList"></select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-sm-3 control-label" for="message">Message:</label>
+                                        <div class="col-sm-4">
+                                            <textarea class="form-control input-sm" name="message" ng-model="outputData.beeUser.message"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-sm-3 control-label" for="contactPreference">Contact Preference:</label>
+                                        <div class="col-sm-4">
+                                            <input type="radio" name="contactPreference" value="1" ng-model="outputData.beeUser.contactPreference">Phone
+                                            <input type="radio" name="contactPreference" value="2" ng-model="outputData.beeUser.contactPreference">Email
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-sm-3 control-label" for="textNotifications">Text Notifications:</label>
+                                        <div class="col-sm-4">
+                                            <input type="checkbox" name="textNotifications" ng-model="outputData.beeUser.textNotifications">
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-sm-3 control-label" for="paymentMode">Payment Mode:</label>
+                                        <div class="col-sm-4">
+                                            <input type="radio" name="paymentMode" value="1" ng-model="outputData.beeUser.paymentMode">Cash
+                                            <input type="radio" name="paymentMode" value="2" ng-model="outputData.beeUser.paymentMode">Credit Card
+                                        </div>
+                                    </div>
+                                    <span class="pull-right">
+                                        <button name="prevToProfile" ng-disabled="vehCountForm.vehCount.$error.required" ng-click="showPop(); currentStep=3;" class="btn btn-primary btn-sm">Previous</button>
+                                        <button name="saveProfile" ng-click="currentStep=5;saveServiceRequest();" class="btn btn-primary btn-sm">Order Now</button>
+                                    </span>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="row panel-heading" style="background-color:lightgray">
-                                        <div class="col-xs-2">Vehicle type</div>
-                                        <div class="col-xs-1">Class</div>
-                                        <div class="col-xs-4">Service</div>
-                                        <div class="col-xs-4">Addons</div>
-                                        <div class="col-xs-1">Total Price</div>
+                            <div ng-show="currentStep==5">
+                                <div class="row">
+                                    <div class="alert alert-success">
+                                        Your service request has been registered <strong>successfully</strong>. Find below the details.
                                     </div>
-                                    <div class="row" ng-repeat="requestData in outputData.serviceRequestVehicles">
-                                        <div class="col-xs-2">{{getSelectedVehType(requestData.vehicleTypeID).type}}</div>
-                                        <div class="col-xs-1">{{getSelectedVehClass(requestData.vehicleTypeID,requestData.vehicleClassID).name}}</div>
-                                        <div class="col-xs-4">{{getSelectedVehServiceType(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID).name}} ({{getSelectedVehServiceType(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID).cost}} KD)</div>
-                                        <div class="col-xs-4">
-                                            <div class="row" ng-repeat="serviceAddonID in requestData.vehicleAddonIDs">
-                                                <div class="col-xs-12">{{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).name}} ({{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).cost}}KD)</div>
-                                            </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="row panel-heading" style="background-color:lightgray">
+                                            <div class="col-xs-2">Vehicle type</div>
+                                            <div class="col-xs-1">Class</div>
+                                            <div class="col-xs-4">Service</div>
+                                            <div class="col-xs-4">Addons</div>
+                                            <div class="col-xs-1">Total Price</div>
                                         </div>
-                                        <div class="col-xs-1">{{getCostForRequest(requestData)}} KD</div>
-                                    </div>
-                                    <div class="row panel-footer">
-                                        <div class="col-xs-7"></div>
-                                        <div class="col-xs-4"><strong>Total cost :</strong></div>
-                                        <div class="col-xs-1"><strong>{{calculateTotalCost()}} KD</strong></div>
+                                        <div class="row" ng-repeat="requestData in outputData.serviceRequestVehicles">
+                                            <div class="col-xs-2">{{getSelectedVehType(requestData.vehicleTypeID).type}}</div>
+                                            <div class="col-xs-1">{{getSelectedVehClass(requestData.vehicleTypeID,requestData.vehicleClassID).name}}</div>
+                                            <div class="col-xs-4">{{getSelectedVehServiceType(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID).name}} ({{getSelectedVehServiceType(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID).cost}} KD)</div>
+                                            <div class="col-xs-4">
+                                                <div class="row" ng-repeat="serviceAddonID in requestData.vehicleAddonIDs">
+                                                    <div class="col-xs-12">{{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).name}} ({{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).cost}}KD)</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-1">{{getCostForRequest(requestData)}} KD</div>
+                                        </div>
+                                        <div class="row panel-footer">
+                                            <div class="col-xs-7"></div>
+                                            <div class="col-xs-4"><strong>Total cost :</strong></div>
+                                            <div class="col-xs-1"><strong>{{calculateTotalCost()}} KD</strong></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -210,40 +204,41 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="panel panel-success" ng-show="currentStep<5">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Service Order Summary</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="row" ng-hide="outputData.serviceRequestVehicles.length>0">
-                        <div class="col-md-12" id="emptymsg">No Service Selected</div>
+            <div class="col-sm-4">
+                <div class="panel panel-success" ng-show="currentStep<5">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Service Order Summary</h3>
                     </div>
-                    <div ng-show="outputData.serviceRequestVehicles.length>0">
-                        <div class="row">
-                            <div class="col-md-4">Vehicle</div>
-                            <div class="col-md-5">Service</div>
-                            <div class="col-md-3">Cost</div>
+                    <div class="panel-body">
+                        <div class="row" ng-hide="outputData.serviceRequestVehicles.length>0">
+                            <div class="col-sm-12" id="emptymsg">No Service Selected</div>
                         </div>
-                        <div ng-repeat="requestData in outputData.serviceRequestVehicles">
+                        <div ng-show="outputData.serviceRequestVehicles.length>0">
                             <div class="row">
-                                <div class="col-xs-4">{{getSelectedVehType(requestData.vehicleTypeID).type}}</div>
-                                <div class="col-xs-5">
-                                    <div ng-if="requestData.serviceTypeID != undefined && requestData.serviceTypeID != 0">{{getSelectedVehServiceType(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID).name}}</div>
-                                    <ul class="sublist">
-                                        <li ng-repeat="serviceAddonID in requestData.vehicleAddonIDs">
-                                            {{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).name}} ({{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).cost}}KD)
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="col-xs-3 ttlprice subtotal">{{getCostForRequest(requestData)}} KD</div>
+                                <div class="col-sm-4">Vehicle</div>
+                                <div class="col-sm-5">Service</div>
+                                <div class="col-sm-3">Cost</div>
                             </div>
                             <hr />
-                        </div>
-                        <div class="row">
-                            <div class="col-xs-9">Total  : </div>
-                            <div class="col-xs-3 ttlprice grandtotal">{{calculateTotalCost()}} KD</div>
+                            <div ng-repeat="requestData in outputData.serviceRequestVehicles">
+                                <div class="row">
+                                    <div class="col-xs-4">{{getSelectedVehType(requestData.vehicleTypeID).type}}</div>
+                                    <div class="col-xs-5">
+                                        <div ng-if="requestData.serviceTypeID != undefined && requestData.serviceTypeID != 0">{{getSelectedVehServiceType(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID).name}}</div>
+                                        <ul class="sublist">
+                                            <li ng-repeat="serviceAddonID in requestData.vehicleAddonIDs">
+                                                {{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).name}} ({{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).cost}}KD)
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-xs-3 ttlprice subtotal">{{getCostForRequest(requestData)}} KD</div>
+                                </div>
+                                <hr />
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-9">Total  : </div>
+                                <div class="col-xs-3 ttlprice grandtotal">{{calculateTotalCost()}} KD</div>
+                            </div>
                         </div>
                     </div>
                 </div>

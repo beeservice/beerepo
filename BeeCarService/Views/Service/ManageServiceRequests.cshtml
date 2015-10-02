@@ -9,75 +9,77 @@
         var serviceCalendarEvents = @Html.Raw(Model);
 </script>
 
-<div ng-app="service" class="container" ng-controller="ListServiceRequestCtrl as lstSerReqCtrl" ng-init="loadRequests(); getExistingServiceRequests(); ">
-    <div class="panel panel-primary main-panel">
-        <div class="panel-heading">
-            <ul class="nav nav-tabs nav-justified" role="tablist">
-                <li role="presentation" class="{{adminTab==1 ? 'active' : ''}}"><a aria-controls="vehicle-summary" role="tab" ng-click="adminTab=1">Administration</a></li>
-                <li role="presentation" class="{{adminTab==2 ? 'active' : ''}}"><a aria-controls="select-service" role="tab" ng-click="adminTab=2">Schedule</a></li>
-            </ul>
-        </div>
-        <div class="panel-body">
-            <div class="tab-content">
-                <div ng-show="adminTab==1" class="row">
-                    <div class="col-sm-1"></div>
-                    <div class="col-sm-10">
-                        <div class="panel panel-primary main-panel">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-2">Service Request ID</div>
-                                    <div class="col-xs-3">Start Time</div>
-                                    <div class="col-xs-2">No. Of Vehicles</div>
-                                    <div class="col-xs-2">Status</div>
-                                    <div class="col-xs-3">Action</div>
+<div class="main_container">
+    <div ng-app="service" ng-controller="ListServiceRequestCtrl as lstSerReqCtrl" ng-init="loadCalendar(); getExistingServiceRequests(); ">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <ul class="nav nav-tabs tabbable" role="tablist">
+                    <li role="presentation" class="{{adminTab==1 ? 'active' : ''}}"><a aria-controls="Administration" role="tab" ng-click="adminTab=1">Administration</a></li>
+                    <li role="presentation" class="{{adminTab==2 ? 'active' : ''}}"><a aria-controls="Schedule" role="tab" ng-click="adminTab=2">Schedule</a></li>
+                </ul>
+            </div>
+            <div class="panel-body">
+                <div class="tab-content">
+                    <div ng-show="adminTab==1" class="row">
+                        <div class="col-sm-1"></div>
+                        <div class="col-sm-10">
+                            <div class="panel panel-primary main-panel">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-xs-2">Service Request ID</div>
+                                        <div class="col-xs-3">Start Time</div>
+                                        <div class="col-xs-2">No. Of Vehicles</div>
+                                        <div class="col-xs-2">Status</div>
+                                        <div class="col-xs-3">Action</div>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="panel-body">
-                                <div class="row" ng-repeat="serviceRequest in existingServiceRequests">
-                                    <div style="height:30px" class="col-xs-2">SReq-{{serviceRequest.id}}</div>
-                                    <div class="col-xs-3">{{serviceRequest.startTime}}</div>
-                                    <div class="col-xs-2">{{serviceRequest.vehicleCount}}</div>
-                                    <div class="col-xs-2">{{statusList[serviceRequest.status]}}</div>
-                                    <div class="col-xs-3">
-                                        <div>
-                                            <button ng-disabled="serviceRequest.status>0" name="cancelServiceRequest_{{serviceRequest.id}}" ng-click="cancelServiceRequest(serviceRequest.id)" class="btn btn-primary btn-sm">Cancel</button>
-                                            <button ng-disabled="serviceRequest.status>0" name="start1ServiceRequest_{{serviceRequest.id}}" ng-click="updateServiceRequestStatus(serviceRequest.id, 1)" class="btn btn-primary btn-sm">Start</button>
-                                            <button ng-disabled="serviceRequest.status>1" name="completeServiceRequest_{{serviceRequest.id}}" ng-click="updateServiceRequestStatus(serviceRequest.id, 2)" class="btn btn-primary btn-sm">Complete</button>
+                                <div class="panel-body">
+                                    <div class="row" ng-repeat="serviceRequest in existingServiceRequests">
+                                        <div style="height:30px" class="col-xs-2">SReq-{{serviceRequest.id}}</div>
+                                        <div class="col-xs-3">{{serviceRequest.startTime}}</div>
+                                        <div class="col-xs-2">{{serviceRequest.vehicleCount}}</div>
+                                        <div class="col-xs-2">{{statusList[serviceRequest.status]}}</div>
+                                        <div class="col-xs-3">
+                                            <div>
+                                                <button ng-disabled="serviceRequest.status>0" name="cancelServiceRequest_{{serviceRequest.id}}" ng-click="cancelServiceRequest(serviceRequest.id)" class="btn btn-primary btn-sm">Cancel</button>
+                                                <button ng-disabled="serviceRequest.status>0" name="start1ServiceRequest_{{serviceRequest.id}}" ng-click="updateServiceRequestStatus(serviceRequest.id, 1)" class="btn btn-primary btn-sm">Start</button>
+                                                <button ng-disabled="serviceRequest.status>1" name="completeServiceRequest_{{serviceRequest.id}}" ng-click="updateServiceRequestStatus(serviceRequest.id, 2)" class="btn btn-primary btn-sm">Complete</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <div class="col-sm-1"></div>
                     </div>
-                    <div class="col-sm-1"></div>
-                </div>
-                
-                <div ng-show="adminTab==2" class="row">
-                    <div class="col-sm-1"></div>
-                    <div class="col-sm-10">
-                        <div class="panel panel-primary main-panel">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-12">Service Schedule</div>
-                                </div>
-                            </div>
 
-                            <div class="panel-body">
-                                <div class="row">
-                                    <div class="col-xs-1"></div>
-                                    <div class="col-xs-10">
-                                        <div id='calendar'></div>
+                    <div ng-show="adminTab==2" class="row">
+                        <div class="col-sm-1"></div>
+                        <div class="col-sm-10">
+                            <div class="panel panel-primary main-panel">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-xs-12">Service Schedule</div>
                                     </div>
-                                    <div class="col-xs-1"></div>
+                                </div>
+
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-xs-1"></div>
+                                        <div class="col-xs-10">
+                                            <div id='calendar'></div>
+                                        </div>
+                                        <div class="col-xs-1"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <div class="col-sm-1"></div>
                     </div>
-                    <div class="col-sm-1"></div>
-                </div>
 
-                
+
+                </div>
             </div>
         </div>
     </div>
