@@ -83,7 +83,7 @@ namespace BeeCarService.Controllers
             }
             srClient.MasterData = GetMasterData();
             srClient.Landmarks = GetLandmarks();
-            srClient.CalendarEvents = GetCalendarEvents();
+            srClient.CalendarEvents = GetCalendarEventsJSON();
 
             return View("Index", "", srClient);
         }
@@ -296,7 +296,22 @@ namespace BeeCarService.Controllers
             return strMasterData;
         }
 
-        private string GetCalendarEvents()
+        private string GetCalendarEventsJSON()
+        {
+
+            List<TeamCalendar> lstTeamCalendar = GetCalendarEvents();
+
+            JsonSerializerSettings settings = new JsonSerializerSettings()
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
+
+            string strCalendar = JsonConvert.SerializeObject(lstTeamCalendar, settings);
+
+            return strCalendar;
+        }
+
+        private List<TeamCalendar> GetCalendarEvents()
         {
 
             DBModels.BeeServiceEntities2 context = new DBModels.BeeServiceEntities2();
@@ -325,7 +340,7 @@ namespace BeeCarService.Controllers
                     {
                         sEvent.End = (DateTime)serviceRequest.ServiceEndTime;
                     }
-                    sEvent.Duration= (int) serviceRequest.ServiceDuration;
+                    sEvent.Duration = (int)serviceRequest.ServiceDuration;
 
                     tCal.ServiceEvents.Add(sEvent);
                 }
@@ -333,14 +348,7 @@ namespace BeeCarService.Controllers
                 lstTeamCalendar.Add(tCal);
             }
 
-            JsonSerializerSettings settings = new JsonSerializerSettings()
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
-            };
-
-            string strCalendar = JsonConvert.SerializeObject(lstTeamCalendar, settings);
-
-            return strCalendar;
+            return lstTeamCalendar;
         }
 
 
@@ -352,6 +360,7 @@ namespace BeeCarService.Controllers
             DBModels.BeeServiceEntities2 context = new DBModels.BeeServiceEntities2();
             Data.ServiceRequest serviceRequest;
             int TotalDuration = 0;
+            int serviceTeamID = 0;
 
             if (SRequest.ID != 0)
             {
@@ -409,6 +418,10 @@ namespace BeeCarService.Controllers
             }
             serviceRequest.ServiceDuration = TotalDuration; //Service request in pending state
             serviceRequest.ServiceEndTime = SRequest.StartTime.AddMinutes(TotalDuration);
+            serviceTeamID = getAvailableServiceTeam(SRequest.StartTime, SRequest.StartTime.AddMinutes(TotalDuration));
+            if (serviceTeamID == 0)
+                throw new ServiceException("No service team available for the specified time");
+            serviceRequest.ServiceTeamID = serviceTeamID;
             if (SRequest.ID == 0)
                 context.ServiceRequests.Add(serviceRequest);
             context.SaveChanges();
@@ -418,6 +431,34 @@ namespace BeeCarService.Controllers
 
             return View();
         }
+
+        private int getAvailableServiceTeam(DateTime ServiceStart, DateTime ServiceEnd)
+        {
+
+            List<TeamCalendar> lstTeamCalendar = GetCalendarEvents();
+            for (int i=0; i<lstTeamCalendar.Count; i++)
+            {
+                if (!IsOverlapping(ServiceStart, ServiceEnd, lstTeamCalendar[i].ServiceEvents))
+                {
+                    return lstTeamCalendar[i].ServiceTeamID;
+                }
+            }
+            return 0;
+        }
+
+        private bool IsOverlapping(DateTime ServiceStart, DateTime ServiceEnd, List<ServiceEvent> EventArray)
+        {
+            // "calendar" on line below should ref the element on which fc has been called 
+            for (int i=0; i<EventArray.Count; i++)
+            {
+                if (ServiceEnd > EventArray[i].Start && ServiceStart < EventArray[i].End)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
 
         private bool IsServiceSlotAvailable(DateTime startTime, short duration)
         {
