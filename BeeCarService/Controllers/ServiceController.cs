@@ -17,12 +17,32 @@ namespace BeeCarService.Controllers
     {
 
         // GET: Service
-        public ActionResult Index(int SRID = 0)
+        public ActionResult RequestService(int SRID = 0)
         {
 
             DBModels.BeeServiceEntities2 context = new DBModels.BeeServiceEntities2();
             ServiceRequest objClientSR = new ServiceRequest();
             SRClientModel srClient = new SRClientModel();
+            int BeeUserID = 0;
+            string strClientSR = "{}";
+
+            if (Session["CustomerID"] !=null)
+            {
+                BeeUserID = Convert.ToInt32(Session["CustomerID"]);
+                DBModels.BeeUser objBeeUser = context.BeeUsers.Where(a => a.Id == BeeUserID).FirstOrDefault();
+
+                objClientSR.BeeUser = new BeeUser();
+                objClientSR.BeeUser.Id = objBeeUser.Id;
+                objClientSR.BeeUser.Address = objBeeUser.Address;
+                objClientSR.BeeUser.ContactPreference = objBeeUser.ContactPreference;
+                objClientSR.BeeUser.Email = objBeeUser.Email;
+                objClientSR.BeeUser.FullName = objBeeUser.FullName;
+                objClientSR.BeeUser.LandmarkID = (int)objBeeUser.LandmarkID.GetValueOrDefault(0);
+                objClientSR.BeeUser.Message = objBeeUser.Message;
+                objClientSR.BeeUser.PaymentMode = objBeeUser.PaymentMode;
+                objClientSR.BeeUser.Phone = objBeeUser.Phone;
+                objClientSR.BeeUser.TextNotifications = objBeeUser.TextNotifications;
+            }
 
             if (SRID != 0)
             {
@@ -35,17 +55,6 @@ namespace BeeCarService.Controllers
                 objClientSR.ServiceDuration = (int)objDBSR.ServiceDuration;
                 objClientSR.EndTime = objDBSR.ServiceStartTime.AddMinutes((int)objClientSR.ServiceDuration);
                 objClientSR.Status = objDBSR.Status;
-                objClientSR.BeeUser = new BeeUser();
-                objClientSR.BeeUser.Id = objDBSR.BeeUser.Id;
-                objClientSR.BeeUser.Address = objDBSR.BeeUser.Address;
-                objClientSR.BeeUser.ContactPreference = objDBSR.BeeUser.ContactPreference;
-                objClientSR.BeeUser.Email = objDBSR.BeeUser.Email;
-                objClientSR.BeeUser.FullName = objDBSR.BeeUser.FullName;
-                objClientSR.BeeUser.LandmarkID = (int) objDBSR.BeeUser.LandmarkID.GetValueOrDefault(0);
-                objClientSR.BeeUser.Message = objDBSR.BeeUser.Message;
-                objClientSR.BeeUser.PaymentMode = objDBSR.BeeUser.PaymentMode;
-                objClientSR.BeeUser.Phone = objDBSR.BeeUser.Phone;
-                objClientSR.BeeUser.TextNotifications = objDBSR.BeeUser.TextNotifications;
 
                 objClientSR.ServiceRequestVehicles = new List<ServiceRequestVehicle>();
 
@@ -65,27 +74,26 @@ namespace BeeCarService.Controllers
                     }
 
                     objClientSR.ServiceRequestVehicles.Add(objClientSRVehicle);
-
                 }
 
+            }
 
+            if (BeeUserID!=0 || SRID!=0)
+            {
                 JsonSerializerSettings settings = new JsonSerializerSettings()
                 {
                     ContractResolver = new CamelCasePropertyNamesContractResolver()
                 };
 
-                string strClientSR = JsonConvert.SerializeObject(objClientSR, settings);
-                srClient.ClientSR = strClientSR;
+                strClientSR = JsonConvert.SerializeObject(objClientSR, settings);
             }
-            else
-            {
-                srClient.ClientSR = "{}";
-            }
+
+            srClient.ClientSR = strClientSR;
             srClient.MasterData = GetMasterData();
             srClient.Landmarks = GetLandmarks();
             srClient.CalendarEvents = GetCalendarEventsJSON();
 
-            return View("Index", "", srClient);
+            return View("RequestService", "", srClient);
         }
 
         public ActionResult ManageServiceRequests()
@@ -95,7 +103,7 @@ namespace BeeCarService.Controllers
                 return RedirectToAction("Login");
             }
 
-            return View("ManageServiceRequests", "", GetCalendarEvents());
+            return View("ManageServiceRequests", "", GetCalendarEventsJSON());
         }
 
 
@@ -354,82 +362,121 @@ namespace BeeCarService.Controllers
 
         // POST: Default/Create
         [HttpPost]
-        public ActionResult SaveServiceRequest(ServiceRequest SRequest)
+        public JsonResult SaveServiceRequest(ServiceRequest SRequest)
         {
-
-            DBModels.BeeServiceEntities2 context = new DBModels.BeeServiceEntities2();
-            Data.ServiceRequest serviceRequest;
-            int TotalDuration = 0;
-            int serviceTeamID = 0;
-
-            if (SRequest.ID != 0)
+            string strMessage;
+            string strPassword="";
+            string strMailBody = "Your service request has been registered successfully. Please login using your emailid.";
+            try
             {
-                serviceRequest = context.ServiceRequests.Where(a => a.ID.Equals(SRequest.ID)).FirstOrDefault();
-                while (serviceRequest.ServiceRequestVehicles.Any())
+                DBModels.BeeServiceEntities2 context = new DBModels.BeeServiceEntities2();
+                DBModels.ServiceRequest serviceRequest;
+                int TotalDuration = 0;
+                int serviceTeamID = 0;
+
+                if (SRequest.ID != 0)
                 {
-                    Data.ServiceRequestVehicle objServiceRequestVehicle = serviceRequest.ServiceRequestVehicles.First();
-                    while (objServiceRequestVehicle.ServiceAddOns.Any())
-                        context.ServiceAddOns.Remove(objServiceRequestVehicle.ServiceAddOns.First());
-                    context.ServiceRequestVehicles.Remove(objServiceRequestVehicle);
-                }
-            }
-            else
-            {
-                serviceRequest = new Data.ServiceRequest();
-                serviceRequest.BeeUser = new Data.BeeUser();
-            }
-
-            serviceRequest.ServiceStartTime = SRequest.StartTime;
-            serviceRequest.Status = 0; //Service request in pending state
-            serviceRequest.BeeUser.Address = SRequest.BeeUser.Address;
-            serviceRequest.BeeUser.ContactPreference = SRequest.BeeUser.ContactPreference;
-            serviceRequest.BeeUser.Email = SRequest.BeeUser.Email;
-            serviceRequest.BeeUser.FullName = SRequest.BeeUser.FullName;
-            serviceRequest.BeeUser.LandmarkID = SRequest.BeeUser.LandmarkID;
-            serviceRequest.BeeUser.Message = SRequest.BeeUser.Message;
-            serviceRequest.BeeUser.PaymentMode = SRequest.BeeUser.PaymentMode;
-            serviceRequest.BeeUser.Phone= SRequest.BeeUser.Phone;
-            serviceRequest.BeeUser.TextNotifications = SRequest.BeeUser.TextNotifications;
-
-            serviceRequest.BeeUser.RegDate = System.DateTime.Now;
-            serviceRequest.BeeUser.Password = "password";
-            serviceRequest.BeeUser.Username = "";
-
-            foreach (var SRVehicle in SRequest.ServiceRequestVehicles)
-            {
-                var SReqVehicle = new Data.ServiceRequestVehicle();
-                TotalDuration = TotalDuration + (int) context.ServiceTypes.Find(SRVehicle.ServiceTypeID).Duration;
-                SReqVehicle.VehicleClassID = SRVehicle.VehicleClassID;
-                SReqVehicle.ServiceTypeID = SRVehicle.ServiceTypeID;
-                SReqVehicle.VehicleTypeID = SRVehicle.VehicleTypeID;
-                if (SRVehicle.VehicleAddonIDs != null)
-                {
-                    foreach (int SRAddOnID in SRVehicle.VehicleAddonIDs)
+                    serviceRequest = context.ServiceRequests.Where(a => a.ID.Equals(SRequest.ID)).FirstOrDefault();
+                    while (serviceRequest.ServiceRequestVehicles.Any())
                     {
-                        if(SRAddOnID != 0)
+                        Data.ServiceRequestVehicle objServiceRequestVehicle = serviceRequest.ServiceRequestVehicles.First();
+                        while (objServiceRequestVehicle.ServiceAddOns.Any())
+                            context.ServiceAddOns.Remove(objServiceRequestVehicle.ServiceAddOns.First());
+                        context.ServiceRequestVehicles.Remove(objServiceRequestVehicle);
+                    }
+                }
+                else
+                {
+                    serviceRequest = new DBModels.ServiceRequest();
+                    if (SRequest.BeeUser.Id!=0)
+                    {
+                        serviceRequest.BeeUser = context.BeeUsers.Where(a => a.Id.Equals(SRequest.BeeUser.Id)).FirstOrDefault();
+                    }
+                    else
+                    {
+                        serviceRequest.BeeUser = new Data.BeeUser();
+                        if (isEmailDuplicate(SRequest.BeeUser.Email))
                         {
-                            var SReqAddon = new Data.ServiceAddOn();
-                            SReqAddon.AddOnID = SRAddOnID;
-                            SReqVehicle.ServiceAddOns.Add(SReqAddon);
+                            throw new ServiceException("This email ID has already been registered with us");
                         }
                     }
                 }
-                serviceRequest.ServiceRequestVehicles.Add(SReqVehicle);
+
+                serviceRequest.ServiceStartTime = SRequest.StartTime;
+                serviceRequest.Status = 0; //Service request in pending state
+                serviceRequest.BeeUser.Address = SRequest.BeeUser.Address;
+                serviceRequest.BeeUser.ContactPreference = SRequest.BeeUser.ContactPreference;
+                serviceRequest.BeeUser.LandmarkID = SRequest.BeeUser.LandmarkID;
+                serviceRequest.BeeUser.Message = SRequest.BeeUser.Message;
+                serviceRequest.BeeUser.PaymentMode = SRequest.BeeUser.PaymentMode;
+                serviceRequest.BeeUser.Phone = SRequest.BeeUser.Phone;
+                serviceRequest.BeeUser.TextNotifications = SRequest.BeeUser.TextNotifications;
+                if (SRequest.BeeUser.Id == 0)
+                {
+                    serviceRequest.BeeUser.Email = SRequest.BeeUser.Email;
+                    serviceRequest.BeeUser.FullName = SRequest.BeeUser.FullName;
+                    serviceRequest.BeeUser.RegDate = System.DateTime.Now;
+                    strPassword = System.Web.Security.Membership.GeneratePassword(8, 0);
+                    strMailBody = strMailBody + "Your password is:" + strPassword;
+                    serviceRequest.BeeUser.Password = strPassword;
+                    serviceRequest.BeeUser.Username = "";
+                }
+
+
+                foreach (var SRVehicle in SRequest.ServiceRequestVehicles)
+                {
+                    var SReqVehicle = new Data.ServiceRequestVehicle();
+                    TotalDuration = TotalDuration + (int)context.ServiceTypes.Find(SRVehicle.ServiceTypeID).Duration;
+                    SReqVehicle.VehicleClassID = SRVehicle.VehicleClassID;
+                    SReqVehicle.ServiceTypeID = SRVehicle.ServiceTypeID;
+                    SReqVehicle.VehicleTypeID = SRVehicle.VehicleTypeID;
+                    if (SRVehicle.VehicleAddonIDs != null)
+                    {
+                        foreach (int SRAddOnID in SRVehicle.VehicleAddonIDs)
+                        {
+                            if (SRAddOnID != 0)
+                            {
+                                var SReqAddon = new Data.ServiceAddOn();
+                                SReqAddon.AddOnID = SRAddOnID;
+                                SReqVehicle.ServiceAddOns.Add(SReqAddon);
+                            }
+                        }
+                    }
+                    serviceRequest.ServiceRequestVehicles.Add(SReqVehicle);
+                }
+                serviceRequest.ServiceDuration = TotalDuration; //Service request in pending state
+                serviceRequest.ServiceEndTime = SRequest.StartTime.AddMinutes(TotalDuration);
+                serviceTeamID = getAvailableServiceTeam(SRequest.StartTime, SRequest.StartTime.AddMinutes(TotalDuration));
+                if (serviceTeamID == 0)
+                    throw new ServiceException("No service team available for the specified time");
+
+                serviceRequest.ServiceTeamID = serviceTeamID;
+                if (SRequest.ID == 0)
+                    context.ServiceRequests.Add(serviceRequest);
+
+                context.SaveChanges();
+                if (SRequest.ID == 0)
+                    sendMail(strMailBody);
             }
-            serviceRequest.ServiceDuration = TotalDuration; //Service request in pending state
-            serviceRequest.ServiceEndTime = SRequest.StartTime.AddMinutes(TotalDuration);
-            serviceTeamID = getAvailableServiceTeam(SRequest.StartTime, SRequest.StartTime.AddMinutes(TotalDuration));
-            if (serviceTeamID == 0)
-                throw new ServiceException("No service team available for the specified time");
-            serviceRequest.ServiceTeamID = serviceTeamID;
-            if (SRequest.ID == 0)
-                context.ServiceRequests.Add(serviceRequest);
-            context.SaveChanges();
-
-            sendMail("");
+            catch (Exception e)
+            {
+                strMessage = "{\"success\": 0, \"message\": \"Failed to save the service request. (" + e.Message + ")\"}";
+                return Json(strMessage, JsonRequestBehavior.AllowGet);
+            } 
+            finally
+            {
                 //sendMail(BuildServiceDetails(serviceRequest.ID));
-
-            return View();
+            }
+            strMessage = ("{\"success\": 1, \"message\": \"Service request registered successfully\"}");
+            return Json(strMessage, JsonRequestBehavior.AllowGet);
+        }
+        private bool isEmailDuplicate(string strMailID)
+        {
+            DBModels.BeeServiceEntities2 dc = new DBModels.BeeServiceEntities2();
+            var v = dc.BeeUsers.Where(a => a.Email.Equals(strMailID)).FirstOrDefault();
+            if (v != null)
+                return true;
+            return false;
         }
 
         private int getAvailableServiceTeam(DateTime ServiceStart, DateTime ServiceEnd)
@@ -459,7 +506,6 @@ namespace BeeCarService.Controllers
             return false;
         }
 
-
         private bool IsServiceSlotAvailable(DateTime startTime, short duration)
         {
             return false;
@@ -469,20 +515,21 @@ namespace BeeCarService.Controllers
         {
             try
             { 
-            MailMessage mail = new MailMessage();
-            SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com");
+                MailMessage mail = new MailMessage();
+                SmtpClient MailClient = new SmtpClient("smtp.gmail.com");
 
-            mail.From = new MailAddress("beecarwash@gmail.com");
-            mail.To.Add("pramadasu@gmail.com");
-            mail.Subject = "Test Mail";
-            mail.Body = "Your service request details: " + bodyText;
+                mail.From = new MailAddress("beecarwash@gmail.com");
+                mail.To.Add("pramadasu@gmail.com");
+                mail.Subject = "Test Mail";
 
-            SmtpServer.Port = 587;
-            SmtpServer.Credentials = new System.Net.NetworkCredential("beecarwash", "demo@123");
-            SmtpServer.EnableSsl = true;
+                mail.Body = bodyText;
 
-            SmtpServer.Send(mail);
-            }
+                MailClient.Port = 587;
+                MailClient.Credentials = new System.Net.NetworkCredential("beecarwash", "demo@123");
+                MailClient.EnableSsl = true;
+                MailClient.Send(mail);
+
+                }
             catch (SmtpException e)
             {
                 Console.WriteLine(e.Message);

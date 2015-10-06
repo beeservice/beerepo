@@ -11,7 +11,9 @@ namespace BeeCarService.Models
         : base() { }
 
         public ServiceException(string message)
-        : base(message) { }
+        : base(message) {
+
+        }
 
         public ServiceException(string format, params object[] args)
         : base(string.Format(format, args)) { }
