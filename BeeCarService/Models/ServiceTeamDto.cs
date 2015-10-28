@@ -5,13 +5,11 @@ using System.Web;
 
 namespace BeeCarService.Models
 {
-    public class MasterData
+    public class ServiceTeamDto
     {
         public int ID { get; set; }
 
-        public string Type { get; set; }
+        public string Name { get; set; }
 
-        public List<VehicleClass> Classes { get; set; }
-
-    }
+     }
 }

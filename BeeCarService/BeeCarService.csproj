@@ -51,6 +51,10 @@
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="LinqKit, Version=1.1.3.1, Culture=neutral, PublicKeyToken=bc217f8844052a91, processorArchitecture=MSIL">
+      <HintPath>..\packages\LinqKit.1.1.3.1\lib\net45\LinqKit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
       <Private>True</Private>
@@ -139,9 +143,14 @@
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\bootstrap2.min.css" />
     <Content Include="Content\fullcalendar.css" />
     <Content Include="Content\fullcalendar.min.css" />
     <Content Include="Content\fullcalendar.print.css" />
+    <Content Include="Content\Images\beeprotect.jpg" />
+    <Content Include="Content\Images\beewash.jpg" />
+    <Content Include="Content\Images\beewax.jpg" />
+    <Content Include="Content\Images\bee_logo.gif" />
     <Content Include="Content\Images\bee_watermark.png" />
     <Content Include="Content\Images\bg_image_lg.jpg" />
     <Content Include="Content\Images\bg_image_lg1.jpg" />
@@ -154,13 +163,13 @@
     <Content Include="Content\Images\Car.jpg" />
     <Content Include="Content\Images\car.png" />
     <Content Include="Content\Images\car1.png" />
-    <Content Include="Content\Images\carmain.png" />
     <Content Include="Content\Images\cars.jpg" />
     <Content Include="Content\Images\cartrans.png" />
     <Content Include="Content\Images\car_1.png" />
     <Content Include="Content\Images\car_wash.png" />
     <Content Include="Content\Images\car_watermark.png" />
     <Content Include="Content\Images\car_watermark1.png" />
+    <Content Include="Content\Images\email.png" />
     <Content Include="Content\Images\Hatchback.jpg" />
     <Content Include="Content\Images\hatchback.png" />
     <Content Include="Content\Images\home.jpg" />
@@ -168,13 +177,16 @@
     <Content Include="Content\Images\logo.jpg" />
     <Content Include="Content\Images\logo.png" />
     <Content Include="Content\Images\progress.gif" />
+    <Content Include="Content\Images\queenwash.jpg" />
     <Content Include="Content\Images\Regular.png" />
     <Content Include="Content\Images\Sedan.jpg" />
     <Content Include="Content\Images\Sedan.png" />
     <Content Include="Content\Images\Service.jpg" />
+    <Content Include="Content\Images\snapchat.jpg" />
     <Content Include="Content\Images\Sports Bike.png" />
     <Content Include="Content\Images\SUV.jpg" />
     <Content Include="Content\Images\SUV.png" />
+    <Content Include="Content\Images\twitter.png" />
     <Content Include="Content\jquery.datetimepicker.css" />
     <Content Include="Content\Site.css" />
     <Content Include="Content\style.css" />
@@ -190,10 +202,14 @@
     </Content>
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
+    <Content Include="Scripts\angular-animate.js" />
+    <Content Include="Scripts\angular-messages.js" />
     <Content Include="Scripts\angular-mocks.js" />
+    <Content Include="Scripts\angular-route.min.js" />
     <Content Include="Scripts\angular.js" />
     <Content Include="Scripts\angular.min.js" />
     <Content Include="Scripts\app.js" />
+    <Content Include="Scripts\app1.js" />
     <Content Include="Scripts\bootbox.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -204,17 +220,29 @@
     <Content Include="Data\BeeServiceConnection.edmx.diagram">
       <DependentUpon>BeeServiceConnection.edmx</DependentUpon>
     </Content>
+    <None Include="Properties\PublishProfiles\BeeService.pubxml" />
+    <None Include="Properties\PublishProfiles\bpmex.com.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="Scripts\calendar.js" />
     <Content Include="Scripts\fullcalendar.min.js" />
+    <Content Include="Scripts\gcal.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <Content Include="Scripts\jquery.datetimepicker.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\moment.min.js" />
-    <Content Include="Web.config" />
+    <Content Include="Scripts\ui-bootstrap-tpls-0.14.1.js" />
+    <Content Include="Scripts\ui-cal.js" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="ClientModels\ClientVehicleType.cs" />
+    <Compile Include="ClientModels\ClientAddon.cs" />
+    <Compile Include="ClientModels\ClientServiceType.cs" />
+    <Compile Include="ClientModels\ClientVehicleClass.cs" />
     <Compile Include="Controllers\ServiceController.cs" />
     <Compile Include="Data\AddOn.cs">
       <DependentUpon>BeeServiceConnection.tt</DependentUpon>
@@ -270,14 +298,17 @@
     <Compile Include="Models\BeeUser.cs" />
     <Compile Include="Models\Landmark.cs" />
     <Compile Include="Models\MasterData.cs" />
+    <Compile Include="ClientModels\MasterList.cs" />
     <Compile Include="Models\ServiceAddon.cs" />
     <Compile Include="Models\ServiceEvent.cs" />
     <Compile Include="Models\ServiceRequest.cs" />
+    <Compile Include="Models\ServiceRequestCriteriaDto.cs" />
     <Compile Include="Models\ServiceRequestVehicle.cs" />
+    <Compile Include="Models\ServiceTeamDto.cs" />
     <Compile Include="Models\ServiceType.cs" />
     <Compile Include="Models\SRClientModel.cs" />
     <Compile Include="Models\TeamCalendar.cs" />
-    <Compile Include="Models\VechicleClass.cs" />
+    <Compile Include="Models\VehicleClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\ServiceException.cs" />
   </ItemGroup>
@@ -297,6 +328,8 @@
     <Content Include="Views\Service\ServiceDetails.cshtml" />
     <Content Include="Views\Service\ListServiceRequests.cshtml" />
     <Content Include="Views\Service\ManageServiceRequests.cshtml" />
+    <Content Include="Views\Service\Contact.cshtml" />
+    <Content Include="Views\Service\About.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

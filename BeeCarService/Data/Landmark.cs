@@ -22,6 +22,7 @@ namespace BeeCarService.Data
     
         public int ID { get; set; }
         public string LandmarkLocation { get; set; }
+        public short Status { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<BeeUser> BeeUsers { get; set; }

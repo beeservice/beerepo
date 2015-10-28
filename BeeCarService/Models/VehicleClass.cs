@@ -5,7 +5,7 @@ using System.Web;
 
 namespace BeeCarService.Models
 {
-    public class VechicleClass
+    public class VehicleClass
     {
         public int ID { get; set; }
 

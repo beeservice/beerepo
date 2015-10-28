@@ -26,19 +26,17 @@
                     </div>
                     <div class="panel-body">
                         <div class="tab-content">
-                            <div ng-show="currentStep==1" role="tabpanel" class="tab-pane fade in active" id="vehicle-summary">
+                            <div ng-show="currentStep==1">
                                 <div ng-form name="vehCountForm">
                                     <div class="form-group" ng-class="{ 'has-error': (vehCountForm.vehCount.$dirty || vehCountForm.vehCount.$touched) && vehCountForm.vehCount.$invalid }">
-                                        <label class="control-label" for="numberOfVehicles">Please provide number of vehicles requiring service <span style="color:red">*</span></label>
-                                        <input class="form-control" type="number" id="numberOfVehicles" name="vehCount" ng-model="vehicleCount" min="1" max="5" placeholder="Number Of Vehicles" required>
-                                        <div class="help-block" ng-messages="vehCountForm.vehCount.$error" ng-if="vehCountForm.vehCount.$touched || vehCountForm.vehCount.$dirty">
-                                            <p ng-message="required">Vehicle count is required.</p>
-                                            <p ng-message="min, max">You can request service for up to 5 vehicles.</p>
-                                        </div>
+                                        <label class="control-label" for="numberOfVehicles">Click on the number of vehicles you require service for:</label>
+                                        <hr />
+                                        <input type="button" value="1 Vehicle" ng-click="currentStep=2; vehicleCount=1; buildRequests();" class="btn btn-primary btn-xs" />
+                                        <input type="button" value="2 Vehicles" ng-click="currentStep=2; vehicleCount=2; buildRequests();" class="btn btn-primary btn-xs" />
+                                        <input type="button" value="3 Vehicles" ng-click="currentStep=2; vehicleCount=3; buildRequests();" class="btn btn-primary btn-xs" />
+                                        <input type="button" value="4 Vehicles" ng-click="currentStep=2; vehicleCount=4; buildRequests();" class="btn btn-primary btn-xs" />
+                                        <input type="button" value="5 Vehicles" ng-click="currentStep=2; vehicleCount=5; buildRequests();" class="btn btn-primary btn-xs" />
                                     </div>
-                                    <span class="pull-right">
-                                        <button name="buildRequests" ng-disabled="vehCountForm.vehCount.$error.required || vehCountForm.vehCount.$error.min || vehCountForm.vehCount.$error.max" ng-click="buildRequests(); currentStep=2;" class="btn btn-primary btn-sm">Next</button>
-                                    </span>
                                 </div>
                             </div>
 
@@ -46,42 +44,60 @@
                                 <div ng-repeat="requestData in outputData.serviceRequestVehicles" class="services_template">
                                     Vehicle # {{$index+1}}
                                     <div class="row sbox">
-                                        <div class="col-xs-3">Choose One:</div>
-                                        <div class="col-xs-3" ng-repeat="vehicleType in masterData">
-                                            <input name="vehicleType_{{$parent.$index}}_{{$index}}" type="radio" ng-value="vehicleType.id" ng-model="requestData.vehicleTypeID" ng-click="vehicleTypeSelected(requestData)" /><img src="/Content/Images/{{vehicleType.type}}.png" /> {{vehicleType.type}}
+                                        <div class="col-xs-2 gridsubhead">Choose One:</div>
+                                        <div class="col-xs-10">
+                                            <div class="row">
+                                                <div class="col-xs-3 gridsmall" ng-repeat="vehicleType in masterData">
+                                                    <input name="vehicleType_{{$parent.$index}}_{{$index}}" type="radio" ng-value="vehicleType.id" ng-model="requestData.vehicleTypeID" ng-click="vehicleTypeSelected(requestData)" /><img src="/Content/Images/{{vehicleType.type}}.png" ng-click="requestData.vehicleTypeID=vehicleType.id;vehicleTypeSelected(requestData);" /> {{vehicleType.type}}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row sbox" ng-show="requestData.showVehicleClasses">
-                                        <div class="col-xs-3">Vehicle Type : </div>
-                                        <div class="col-xs-3" ng-repeat="vehClass in getSelectedVehType(requestData.vehicleTypeID).classes">
-                                            <input type="radio" name="vehicleClass_{{$parent.$index}}_{{$index}}" ng-value="vehClass.id" ng-model="requestData.vehicleClassID" ng-click="vehicleClassSelected(requestData)" /><img src="~/Content/Images/{{vehClass.name}}.png" />{{vehClass.name}}
+                                        <div class="col-xs-2 gridsubhead">Vehicle Type : </div>
+                                        <div class="col-xs-10">
+                                            <div class="row">
+                                                <div class="col-xs-3 gridsmall" ng-repeat="vehClass in getSelectedVehType(requestData.vehicleTypeID).classes">
+                                                    <input type="radio" name="vehicleClass_{{$parent.$index}}_{{$index}}" ng-value="vehClass.id" ng-model="requestData.vehicleClassID" ng-click="vehicleClassSelected(requestData)" /><img src="~/Content/Images/{{vehClass.name}}.png" ng-click="requestData.vehicleClassID=vehClass.id; vehicleClassSelected(requestData);" />{{vehClass.name}}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row sbox" ng-show="requestData.showVehicleServices">
-                                        <div class="col-xs-3">Service Type : </div>
-                                        <div class="col-xs-3" ng-repeat="vehService in getSelectedVehClass(requestData.vehicleTypeID,requestData.vehicleClassID).services">
-                                            <input type="radio" name="vehService_{{$parent.$index}}_{{$index}}" ng-value="vehService.id" ng-model="requestData.serviceTypeID" ng-click="vehicleServiceSelected(requestData)"><img src="~/Content/Images/car_wash.png" />{{vehService.name}}
+                                        <div class="col-xs-2 gridsubhead">Service Type : </div>
+                                        <div class="col-xs-10">
+                                            <div class="row">
+                                                <div class="col-xs-3 gridsmall" ng-repeat="vehService in getSelectedVehClass(requestData.vehicleTypeID,requestData.vehicleClassID).services">
+                                                    <input type="radio" name="vehService_{{$parent.$index}}_{{$index}}" ng-value="vehService.id" ng-model="requestData.serviceTypeID" ng-click="vehicleServiceSelected(requestData)"><img src="~/Content/Images/car_wash.png" ng-click="requestData.serviceTypeID=vehService.id; vehicleServiceSelected(requestData);" />{{vehService.name}}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row sbox" ng-show="requestData.showVehicleAddons && requestData.serviceTypeID != undefined && requestData.serviceTypeID != 0">
-                                        <div class="col-xs-3">Add On : </div>
-                                        <div class="col-xs-3" ng-repeat="vehAddon in getSelectedVehServiceType(requestData.vehicleTypeID,requestData.vehicleClassID,requestData.serviceTypeID).addons">
-                                            <input type="checkbox" name="vehAddon_{{$parent.$index}}_{{$index}}" value={{vehAddon.id}} ng-checked="{{requestData.vehicleAddonIDs.indexOf(vehAddon.id) > -1}}" ng-click="toggleSelection(requestData, vehAddon.id)"><img src="~/Content/Images/car_wash.png" />{{vehAddon.name}}
+                                        <div class="col-xs-2 gridsubhead">Add On : </div>
+                                        <div class="col-xs-10">
+                                            <div class="row">
+                                                <div class="col-xs-3 gridsmall" ng-repeat="vehAddon in getSelectedVehServiceType(requestData.vehicleTypeID,requestData.vehicleClassID,requestData.serviceTypeID).addons">
+                                                    <input type="checkbox" id="vehAddon_{{$parent.$index}}_{{$index}}" value={{vehAddon.id}} ng-checked="{{requestData.vehicleAddonIDs.indexOf(vehAddon.id) > -1}}" ng-click="toggleSelection(requestData, vehAddon.id)"><img src="~/Content/Images/car_wash.png" />{{vehAddon.name}}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <span class="pull-right">
                                     <button name="prevToService" ng-click="currentStep=1;" class="btn btn-primary btn-sm">Previous</button>
-                                    <button name="saveService" ng-disabled="!allServiceRequestVehiclesValid()" ng-click="calculateTotalDuration(); eventData={}; currentStep=3;" class="btn btn-primary btn-sm">Next</button>
+                                    <button name="saveService" ng-disabled="!allServiceRequestVehiclesValid()" ng-click="currentStep=3; calculateTotalDuration(); findEmptySlots(); renderCalender(); resetEvent(); " class="btn btn-primary btn-sm">Next</button>
                                 </span>
                             </div>
-
                             <div ng-show="currentStep==3">
                                 <div class="row">
                                     <div class="col-sm-1"></div>
                                     <div class="col-sm-10">
                                         <h4>Choose Date/Time</h4>
                                         <div id='calendar'></div>
+                                        <div class="row">
+                                            <div class="col-md-12 text-warning"><span style="color:red">{{dateSelectErrorMsg}}</span></div>
+                                        </div>
                                     </div>
                                     <div class="col-sm-1"></div>
                                 </div>
@@ -224,6 +240,13 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-sm-7 col-sm-offset-5 col-md-5 col-md-offset-7">
+                                        <span class="pull-right">
+                                            <a href="/Service/listServiceRequests" class="btn btn-link btn-sm">MY Service Requests</a>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -239,30 +262,55 @@
                             <div class="col-sm-12" id="emptymsg">No Service Selected</div>
                         </div>
                         <div ng-show="outputData.serviceRequestVehicles.length>0">
-                            <div class="row">
-                                <div class="col-sm-4">Vehicle</div>
-                                <div class="col-sm-5">Service</div>
-                                <div class="col-sm-3">Cost</div>
+                            <div class="row mainhead">
+                                <div class="col-md-3">Vehicle</div>
+                                <div class="col-md-4">Service</div>
+                                <div class="col-md-5">
+                                    <div class="row">
+                                        <div class="col-md-6 mainhead">Time(hrs)</div>
+                                        <div class="col-md-6 mainhead">Cost(KD)</div>
+                                    </div>
+                                </div>
                             </div>
                             <hr />
                             <div ng-repeat="requestData in outputData.serviceRequestVehicles">
-                                <div class="row">
-                                    <div class="col-xs-4">{{getSelectedVehType(requestData.vehicleTypeID).type}}</div>
-                                    <div class="col-xs-5">
+                                <div class="row mainlist">
+                                    <div class="col-md-3">{{getSelectedVehType(requestData.vehicleTypeID).type}}</div>
+                                    <div class="col-md-4">
                                         <div ng-if="requestData.serviceTypeID != undefined && requestData.serviceTypeID != 0">{{getSelectedVehServiceType(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID).name}}</div>
-                                        <ul class="sublist">
-                                            <li ng-repeat="serviceAddonID in requestData.vehicleAddonIDs">
-                                                {{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).name}} ({{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).cost}}KD)
-                                            </li>
-                                        </ul>
                                     </div>
-                                    <div class="col-xs-3 ttlprice subtotal">{{getCostForRequest(requestData)}} KD</div>
+                                    <div class="col-md-5">
+                                        <div class="row">
+                                            <div class="col-md-6 mainlist">{{getSelectedVehServiceType(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID).duration/60}} hrs</div>
+                                            <div class="col-md-6 amountRight">{{getSelectedVehServiceType(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID).cost|currency:'':3}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row sublist" ng-repeat="serviceAddonID in requestData.vehicleAddonIDs">
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-4">
+                                        {{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).name}}
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="row">
+                                            <div class="col-md-6 sublist">{{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).duration}} mins</div>
+                                            <div class="col-md-6 amountRight">{{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).cost|currency:'':3}}</div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <hr />
                             </div>
-                            <div class="row">
-                                <div class="col-xs-9">Total  : </div>
-                                <div class="col-xs-3 ttlprice grandtotal">{{calculateTotalCost()}} KD</div>
+                            <div class="row mainhead">
+                                <div class="col-md-7">Total  : </div>
+                                <div class="col-md-5">
+                                    <div class="row">
+                                        <div class="col-md-6 mainhead">{{calculateTotalDuration(true)}} hrs</div>
+                                        <div class="col-md-6 amountRight">{{calculateTotalCost()|currency:'':3}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row sublist">
+                                <div class="col-md-12">30 mins included for the service personal to arrive at the location</div>
                             </div>
                         </div>
                     </div>

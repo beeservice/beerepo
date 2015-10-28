@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace BeeCarService.Models
+namespace BeeCarService.ClientModels
 {
-    public class MasterData
+    public class ClientVehicleType
     {
         public int ID { get; set; }
 
         public string Type { get; set; }
 
-        public List<VehicleClass> Classes { get; set; }
+        public int Status { get; set; }
 
     }
 }

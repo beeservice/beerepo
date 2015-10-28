@@ -1,0 +1,47 @@
+﻿
+@{
+    ViewBag.Title = "Contact";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Contact", "Service", FormMethod.Get))
+{
+    <div class="main_container" style="vertical-align:central">
+        <div class="row">
+            <div class="col-sm-6" style="display:table-cell; vertical-align:middle; text-align:center">
+                <img src="~/Content/Images/bee_logo.gif" width="300" height="300" style="vertical-align:central"/>
+            </div>
+            <div class="col-sm-6">
+                <div class="well">
+                    <h2 class="content-title">Contact Us</h2>
+                    <p class="content-desc">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum consectetur eros dolor,<br />
+                        sed bibendum turpis luctus eget
+                    </p>
+                    <div class="row">
+                        <div class="col-md-10" data-animation="true" data-animation-type="fadeInLeft">
+                            <h3>If you are interested in our services, would like to discuss, get in touch with us.</h3>
+                            <p>
+                                Morbi interdum mollis sapien. Sed ac risus. Phasellus lacinia, magna a ullamcorper laoreet, lectus arcu pulvinar risus, vitae facilisis libero dolor a purus.
+                            </p>
+                            <p>
+                                <strong>Bee Services</strong><br />
+                                Address Line1<br />
+                                Address Line 2, Kuwait<br />
+                                P: 9777 7777<br />
+                                <span class="phone">+965 9 8009966 / 77</span><br />
+                                <a href="mailto:Info@BeeProtection.net">Info@BeeProtection.net</a>
+                            </p>
+                            <div>
+                                <a href="http://www.instagram.com/BeeProtection"><img title="Twitter" src="~/Content/Images/logo.png" alt="Twitter" width="35" height="35" /></a>
+                                <a href="http://www.twitter.com/BeeProtection"><img title="Twitter" src="~/Content/Images/twitter.png" alt="Twitter" width="35" height="35" /></a>
+                                <a href="mailto:Info@BeeProtection.net"><img title="Email" src="~/Content/Images/email.png" alt="Email" width="35" height="35" /></a>
+                                <a href="http://www.BeeProtection.net/BeeProtection">WebSite</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

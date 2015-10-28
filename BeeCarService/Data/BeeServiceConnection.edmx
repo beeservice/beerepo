@@ -9,10 +9,12 @@
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Name="ID" Type="int" Nullable="false" />
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="AddOn" Type="nvarchar" MaxLength="30" Nullable="false" />
           <Property Name="ServiceTypeID" Type="int" Nullable="false" />
-          <Property Name="Cost" Type="numeric" Precision="6" Scale="2" />
+          <Property Name="Cost" Type="numeric" Precision="6" Scale="3" />
+          <Property Name="Duration" Type="int" />
+          <Property Name="Status" Type="smallint" Nullable="false" />
         </EntityType>
         <EntityType Name="BeeUser">
           <Key>
@@ -38,6 +40,7 @@
           </Key>
           <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="LandmarkLocation" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="Status" Type="smallint" Nullable="false" />
         </EntityType>
         <EntityType Name="ServiceAddOn">
           <Key>
@@ -58,6 +61,7 @@
           <Property Name="ServiceDuration" Type="int" />
           <Property Name="Status" Type="smallint" Nullable="false" />
           <Property Name="ServiceTeamID" Type="int" />
+          <Property Name="ServiceCost" Type="numeric" Precision="7" Scale="3" />
         </EntityType>
         <EntityType Name="ServiceRequestVehicle">
           <Key>
@@ -73,18 +77,20 @@
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Name="ID" Type="int" Nullable="false" />
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="TeamName" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Status" Type="smallint" Nullable="false" />
         </EntityType>
         <EntityType Name="ServiceType">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Name="ID" Type="int" Nullable="false" />
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="ServiceType" Type="nvarchar" MaxLength="30" Nullable="false" />
           <Property Name="VehicleClassID" Type="int" Nullable="false" />
-          <Property Name="Cost" Type="numeric" Precision="6" Scale="2" />
+          <Property Name="Cost" Type="numeric" Precision="6" Scale="3" />
           <Property Name="Duration" Type="int" />
+          <Property Name="Status" Type="smallint" Nullable="false" />
         </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
@@ -100,16 +106,18 @@
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Name="ID" Type="int" Nullable="false" />
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Class" Type="nvarchar" MaxLength="20" Nullable="false" />
           <Property Name="VehichleTypeID" Type="int" Nullable="false" />
+          <Property Name="Status" Type="smallint" Nullable="false" />
         </EntityType>
         <EntityType Name="VehicleType">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Name="ID" Type="int" Nullable="false" />
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="TYPE" Type="nvarchar" MaxLength="10" Nullable="false" />
+          <Property Name="Status" Type="smallint" Nullable="false" />
         </EntityType>
         <Association Name="FK_AddOn_ServiceType">
           <End Role="ServiceType" Type="Self.ServiceType" Multiplicity="1" />
@@ -315,9 +323,11 @@
           <Property Name="ID" Type="Int32" Nullable="false" />
           <Property Name="AddOn1" Type="String" MaxLength="30" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="ServiceTypeID" Type="Int32" Nullable="false" />
-          <Property Name="Cost" Type="Decimal" Precision="6" Scale="2" />
+          <Property Name="Cost" Type="Decimal" Precision="6" Scale="3" />
           <NavigationProperty Name="ServiceType" Relationship="Self.FK_AddOn_ServiceType" FromRole="AddOn" ToRole="ServiceType" />
           <NavigationProperty Name="ServiceAddOns" Relationship="Self.FK_ServiceAddOn_AddOn" FromRole="AddOn" ToRole="ServiceAddOn" />
+          <Property Name="Duration" Type="Int32" />
+          <Property Name="Status" Type="Int16" Nullable="false" />
         </EntityType>
         <EntityType Name="BeeUser">
           <Key>
@@ -346,6 +356,7 @@
           <Property Name="ID" Type="Int32" Nullable="false" />
           <Property Name="LandmarkLocation" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
           <NavigationProperty Name="BeeUsers" Relationship="Self.FK_BeeUser_Landmark" FromRole="Landmark" ToRole="BeeUser" />
+          <Property Name="Status" Type="Int16" Nullable="false" />
         </EntityType>
         <EntityType Name="ServiceAddOn">
           <Key>
@@ -371,6 +382,7 @@
           <NavigationProperty Name="ServiceRequestVehicles" Relationship="Self.FK_ServiceRequestVehicle_ServiceRequest" FromRole="ServiceRequest" ToRole="ServiceRequestVehicle" />
           <Property Name="ServiceTeamID" Type="Int32" />
           <NavigationProperty Name="ServiceTeam" Relationship="BeeServiceModel.FK_ServiceRequest_ServiceTeam" FromRole="ServiceRequest" ToRole="ServiceTeam" />
+          <Property Name="ServiceCost" Type="Decimal" Precision="7" Scale="3" />
         </EntityType>
         <EntityType Name="ServiceRequestVehicle">
           <Key>
@@ -393,11 +405,12 @@
           <Property Name="ID" Type="Int32" Nullable="false" />
           <Property Name="ServiceType1" Type="String" MaxLength="30" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="VehicleClassID" Type="Int32" Nullable="false" />
-          <Property Name="Cost" Type="Decimal" Precision="6" Scale="2" />
+          <Property Name="Cost" Type="Decimal" Precision="6" Scale="3" />
           <Property Name="Duration" Type="Int32" />
           <NavigationProperty Name="AddOns" Relationship="Self.FK_AddOn_ServiceType" FromRole="ServiceType" ToRole="AddOn" />
           <NavigationProperty Name="ServiceRequestVehicles" Relationship="Self.FK_ServiceRequestVehicle_ServiceType" FromRole="ServiceType" ToRole="ServiceRequestVehicle" />
           <NavigationProperty Name="VehicleClass" Relationship="Self.FK_ServiceType_VehicleClass" FromRole="ServiceType" ToRole="VehicleClass" />
+          <Property Name="Status" Type="Int16" Nullable="false" />
         </EntityType>
         <EntityType Name="sysdiagram">
           <Key>
@@ -418,6 +431,7 @@
           <Property Name="VehichleTypeID" Type="Int32" Nullable="false" />
           <NavigationProperty Name="ServiceTypes" Relationship="Self.FK_ServiceType_VehicleClass" FromRole="VehicleClass" ToRole="ServiceType" />
           <NavigationProperty Name="VehicleType" Relationship="Self.FK_VehicleClass_VehicleType" FromRole="VehicleClass" ToRole="VehicleType" />
+          <Property Name="Status" Type="Int16" Nullable="false" />
         </EntityType>
         <EntityType Name="VehicleType">
           <Key>
@@ -427,6 +441,7 @@
           <Property Name="TYPE" Type="String" MaxLength="10" FixedLength="false" Unicode="true" Nullable="false" />
           <NavigationProperty Name="ServiceRequestVehicles" Relationship="Self.FK_ServiceRequestVehicle_VehicleType" FromRole="VehicleType" ToRole="ServiceRequestVehicle" />
           <NavigationProperty Name="VehicleClasses" Relationship="Self.FK_VehicleClass_VehicleType" FromRole="VehicleType" ToRole="VehicleClass" />
+          <Property Name="Status" Type="Int16" Nullable="false" />
         </EntityType>
         <Association Name="FK_AddOn_ServiceType">
           <End Role="ServiceType" Type="Self.ServiceType" Multiplicity="1" />
@@ -616,6 +631,7 @@
           <Property Name="ID" Type="Int32" Nullable="false" />
           <Property Name="TeamName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="ServiceRequests" Relationship="BeeServiceModel.FK_ServiceRequest_ServiceTeam" FromRole="ServiceTeam" ToRole="ServiceRequest" />
+          <Property Name="Status" Type="Int16" Nullable="false" />
         </EntityType>
         <Association Name="FK_ServiceRequest_ServiceTeam">
           <End Type="BeeServiceModel.ServiceTeam" Role="ServiceTeam" Multiplicity="0..1" />
@@ -638,6 +654,8 @@
           <EntitySetMapping Name="AddOns">
             <EntityTypeMapping TypeName="BeeServiceModel.AddOn">
               <MappingFragment StoreEntitySet="AddOn">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Duration" ColumnName="Duration" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="AddOn1" ColumnName="AddOn" />
                 <ScalarProperty Name="ServiceTypeID" ColumnName="ServiceTypeID" />
@@ -667,6 +685,7 @@
           <EntitySetMapping Name="Landmarks">
             <EntityTypeMapping TypeName="BeeServiceModel.Landmark">
               <MappingFragment StoreEntitySet="Landmark">
+                <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="LandmarkLocation" ColumnName="LandmarkLocation" />
               </MappingFragment>
@@ -684,6 +703,7 @@
           <EntitySetMapping Name="ServiceRequests">
             <EntityTypeMapping TypeName="BeeServiceModel.ServiceRequest">
               <MappingFragment StoreEntitySet="ServiceRequest">
+                <ScalarProperty Name="ServiceCost" ColumnName="ServiceCost" />
                 <ScalarProperty Name="ServiceTeamID" ColumnName="ServiceTeamID" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="CustomerID" ColumnName="CustomerID" />
@@ -708,6 +728,7 @@
           <EntitySetMapping Name="ServiceTypes">
             <EntityTypeMapping TypeName="BeeServiceModel.ServiceType">
               <MappingFragment StoreEntitySet="ServiceType">
+                <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="ServiceType1" ColumnName="ServiceType" />
                 <ScalarProperty Name="VehicleClassID" ColumnName="VehicleClassID" />
@@ -730,6 +751,7 @@
           <EntitySetMapping Name="VehicleClasses">
             <EntityTypeMapping TypeName="BeeServiceModel.VehicleClass">
               <MappingFragment StoreEntitySet="VehicleClass">
+                <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="Class" ColumnName="Class" />
                 <ScalarProperty Name="VehichleTypeID" ColumnName="VehichleTypeID" />
@@ -739,6 +761,7 @@
           <EntitySetMapping Name="VehicleTypes">
             <EntityTypeMapping TypeName="BeeServiceModel.VehicleType">
               <MappingFragment StoreEntitySet="VehicleType">
+                <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="TYPE" ColumnName="TYPE" />
               </MappingFragment>
@@ -747,6 +770,7 @@
           <EntitySetMapping Name="ServiceTeams">
             <EntityTypeMapping TypeName="BeeServiceModel.ServiceTeam">
               <MappingFragment StoreEntitySet="ServiceTeam">
+                <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="TeamName" ColumnName="TeamName" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>

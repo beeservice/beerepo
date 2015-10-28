@@ -26,6 +26,7 @@ namespace BeeCarService.Data
         public int VehicleClassID { get; set; }
         public Nullable<decimal> Cost { get; set; }
         public Nullable<int> Duration { get; set; }
+        public short Status { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AddOn> AddOns { get; set; }

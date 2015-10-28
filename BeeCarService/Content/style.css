@@ -99,21 +99,21 @@ hr {
 }
 .btn_scrn,
 .login_scrn {
-    background: url('/Content/images/bg_image_lg.jpg') no-repeat center center;
     background-size: cover;
 }
 .main_btns {
-    text-align: center;
+    text-align:right;
 }
 .main_btns>li {
-    padding-bottom: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 .main_btns>li>a {
     -webkit-border-radius: 0;
     -moz-border-radius: 0;
     border-radius: 0px;
-    font-size: 14px;
-    padding: 10px 15px;
+    font-size: 12px;
+    padding: 7px 11px;
     text-decoration: none;
     text-transform: uppercase;
     font-weight: 400;
@@ -121,14 +121,14 @@ hr {
 .main_btns>li>a {
     color: #fff;
     background: rgba(0, 96, 128, 0.95);
-    border: 2px solid rgba(255, 255, 255, 0.9);
-    border-radius: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
 }
 .main_btns>li>a:hover,
 .main_btns>li>a:focus {
     color: #212121;
     background: rgba(230, 230, 230, 1.0);
-    border: 2px solid rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.5);
 }
 .well {
     background-color: #fff!important;
@@ -276,10 +276,52 @@ hr {
     margin-left: 10px;
 }
 
+.mainhead {
+    font-size: 11px;
+    font-weight:bold;
+    padding: 1px 1px;
+}
+
+.mainlist {
+    font-size: 11px;
+    padding: 1px 1px;
+}
 .sublist {
     font-size: 11px;
     color:#999;
-    padding-left:15px;
+    padding:1px 1px;
+}
+.gridsmall {
+    font-size: 11px;
+    padding:2px 2px;
+}
+.gridsubhead {
+    font-size: 11px;
+    color:darkblue;
+    padding:5px 5px;
+}
+.amountRight{
+    font-size: 11px;
+    padding: 1px 10px 1px 1px;
+    text-align:right;
+}
+.title1 {
+	color: rgba(70, 184, 218, 1);
+	font-family: 'Georgia', serif;
+	font-size: 36px;
+	line-height: 38px;
+	font-weight: normal;
+	margin-bottom: 24px;
+    text-align:center;
+}
+.title2 {
+	letter-spacing: 0;
+	color: #939598;
+	font-family: 'Georgia', serif;
+	font-size: 17px;
+	line-height: 26px;
+	font-weight: normal;
+	margin-bottom: 28px;
 }
 @media (min-width: 768px) {
     .navbar>.container .navbar-brand,
@@ -301,9 +343,6 @@ hr {
     .btn_scrn,
     .login_scrn {
         min-height: 500px;
-    }
-    .main_btns {
-        margin-top: 215px;
     }
     .well.login-box {
         margin: 35px auto;
@@ -340,4 +379,10 @@ hr {
     .well.login-box {
         margin: 15px auto;
     }
+}
+
+.pagination {
+    margin: 0 0;
+    padding-left:0px;
+    border-radius:4px;
 }

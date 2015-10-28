@@ -4,8 +4,8 @@
 
 }
 
-<div >
-    <div class="main_container mainScreen" ng-app="service" ng-controller="ListServiceRequestCtrl as lstSerReqCtrl" ng-init="getExistingServiceRequests()">
+<div class="main_container mainScreen">
+    <div class="service_selection" ng-app="service" ng-controller="ListServiceRequestCtrl as lstSerReqCtrl" ng-init="getExistingServiceRequests()">
 
         <div class="panel-heading">
             <div class="row">
@@ -32,12 +32,12 @@
             <div class="panel-body">
                 <div class="row" style="background-color:white" ng-repeat="serviceRequest in existingServiceRequests">
                     <div class="col-xs-2">SReq-{{serviceRequest.id}}</div>
-                    <div class="col-xs-3">{{serviceRequest.startTime}}</div>
+                    <div class="col-xs-3">{{serviceRequest.formattedStartTime}}</div>
                     <div class="col-xs-2">{{serviceRequest.vehicleCount}}</div>
                     <div class="col-xs-3">{{statusList[serviceRequest.status]}}</div>
                     <div class="col-xs-2">
-                        <button ng-disabled="serviceRequest.status>0" name="edit1ServiceRequest_{{serviceRequest.id}}" ng-click="editServiceRequest(serviceRequest.id)" class="btn btn-primary btn-sm">Reschedule</button>
-                        <button ng-disabled="serviceRequest.status>0" name="cancelServiceRequest_{{serviceRequest.id}}" ng-click="cancelServiceRequest(serviceRequest.id)" class="btn btn-primary btn-sm">Cancel</button>
+                        <button ng-disabled="serviceRequest.status>0 || isStarted(serviceRequest.startTime)" name="edit1ServiceRequest_{{serviceRequest.id}}" ng-click="editServiceRequest(serviceRequest.id)" class="btn btn-primary btn-sm">Reschedule</button>
+                        <button ng-disabled="serviceRequest.status>0 || isStarted(serviceRequest.startTime)" name="cancelServiceRequest_{{serviceRequest.id}}" ng-click="cancelServiceRequest(serviceRequest.id)" class="btn btn-primary btn-sm">Cancel</button>
                     </div>
                 </div>
             </div>

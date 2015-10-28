@@ -1,16 +1,16 @@
 ﻿using DBModels = BeeCarService.Data;
 using BeeCarService.Models;
+using BeeCarService.ClientModels;
 using Newtonsoft.Json;
-
-using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using System.Net;
 using System.Net.Mail;
+using LinqKit;
+using System.Data.Entity;
+
 namespace BeeCarService.Controllers
 {
     public class ServiceController : Controller
@@ -26,7 +26,7 @@ namespace BeeCarService.Controllers
             int BeeUserID = 0;
             string strClientSR = "{}";
 
-            if (Session["CustomerID"] !=null)
+            if (Session["CustomerID"] != null)
             {
                 BeeUserID = Convert.ToInt32(Session["CustomerID"]);
                 DBModels.BeeUser objBeeUser = context.BeeUsers.Where(a => a.Id == BeeUserID).FirstOrDefault();
@@ -78,7 +78,7 @@ namespace BeeCarService.Controllers
 
             }
 
-            if (BeeUserID!=0 || SRID!=0)
+            if (BeeUserID != 0 || SRID != 0)
             {
                 JsonSerializerSettings settings = new JsonSerializerSettings()
                 {
@@ -96,6 +96,16 @@ namespace BeeCarService.Controllers
             return View("RequestService", "", srClient);
         }
 
+        public ActionResult Contact()
+        {
+            return View();
+        }
+
+        public ActionResult About()
+        {
+            return View();
+        }
+
         public ActionResult ManageServiceRequests()
         {
             if (Session["UserName"] == null || Session["UserName"].ToString() != "admin")
@@ -109,7 +119,7 @@ namespace BeeCarService.Controllers
 
         public ActionResult ListServiceRequests()
         {
-            if (Session["LogedUserID"] == null  || Session["LogedUserID"].ToString() == "")
+            if (Session["LogedUserID"] == null || Session["LogedUserID"].ToString() == "")
             {
                 return RedirectToAction("Login");
             }
@@ -126,7 +136,99 @@ namespace BeeCarService.Controllers
             return RedirectToAction("ManageServiceRequests");
         }
 
-        public ActionResult CancelServiceRequest(int serviceRequestId)
+        public ActionResult UpdateMasterDataStatus(int MasterType, int MasterID, short Status)
+        {
+            DBModels.BeeServiceEntities2 context = new DBModels.BeeServiceEntities2();
+            switch (MasterType)
+            {
+                case 0: //Vehicles
+                    Data.VehicleType vehType = context.VehicleTypes.Find(MasterID);
+                    vehType.Status = Status;
+                    break;
+                case 1: //Veh Class
+                    Data.VehicleClass vehClass = context.VehicleClasses.Find(MasterID);
+                    vehClass.Status = Status;
+                    break;
+                case 2: //Veh Class
+                    Data.ServiceType serType = context.ServiceTypes.Find(MasterID);
+                    serType.Status = Status;
+                    break;
+                case 3: //Veh Class
+                    Data.AddOn Addon = context.AddOns.Find(MasterID);
+                    Addon.Status = Status;
+                    break;
+                case 4: //Veh Class
+                    Data.ServiceTeam serTeam = context.ServiceTeams.Find(MasterID);
+                    serTeam.Status = Status;
+                    break;
+                case 5: //Veh Class
+                    Data.Landmark landmark = context.Landmarks.Find(MasterID);
+                    landmark.Status = Status;
+                    break;
+                default:    
+                    break;
+            }
+
+            context.SaveChanges();
+            return RedirectToAction("ManageServiceRequests");
+        }
+
+        public ActionResult AddMasterData(int MasterType, int ParentID, string MasterData)
+        {
+            DBModels.BeeServiceEntities2 context = new DBModels.BeeServiceEntities2();
+
+            try
+            {
+
+                switch (MasterType)
+                {
+                    case 0: //Vehicles
+                        ClientVehicleType vType = (ClientVehicleType)JsonConvert.DeserializeObject(MasterData, typeof(ClientVehicleType));
+                        DBModels.VehicleType vehType = new DBModels.VehicleType();
+                        vehType.TYPE = vType.Type;
+                        context.VehicleTypes.Add(vehType);
+                        break;
+                    case 1: //Veh Class
+                        ClientVehicleClass vClass = (ClientVehicleClass)JsonConvert.DeserializeObject(MasterData, typeof(ClientVehicleClass));
+                        DBModels.VehicleClass vehClass = new DBModels.VehicleClass();
+                        vehClass.VehichleTypeID = ParentID;
+                        vehClass.Class = vClass.Name;
+                        context.VehicleClasses.Add(vehClass);
+                        break;
+                    case 2: //Service Type
+                        ClientServiceType sType = (ClientServiceType)JsonConvert.DeserializeObject(MasterData, typeof(ClientServiceType));
+                        DBModels.ServiceType serType = new DBModels.ServiceType();
+                        serType.VehicleClassID = ParentID;
+                        serType.ServiceType1 = sType.Name;
+                        serType.Duration = sType.Duration;
+                        serType.Cost = sType.Cost;
+                        context.ServiceTypes.Add(serType);
+                        break;
+                    case 3: //Addon
+                        ClientAddon addon = (ClientAddon)JsonConvert.DeserializeObject(MasterData, typeof(ClientAddon));
+                        //"{\"name\":\"fff\",\"duration\":30,\"cost\":5}"
+                        DBModels.AddOn Addon = new DBModels.AddOn();
+                        Addon.ServiceTypeID = ParentID;
+                        Addon.AddOn1 = addon.Name;
+                        Addon.Cost = addon.Cost;
+                        Addon.Duration = addon.Duration;
+                        context.AddOns.Add(Addon);
+                        break;
+                    default:
+                        break;
+                }
+                context.SaveChanges();
+                return RedirectToAction("ManageServiceRequests");
+            }
+            catch (Exception e)
+            {
+                string strMessage = "{\"success\": 0, \"message\": \"Failed to save the service request. (" + e.Message + ")\"}";
+                return Json(strMessage, JsonRequestBehavior.AllowGet);
+            }
+
+}
+
+public ActionResult CancelServiceRequest(int serviceRequestId)
         {
             DBModels.BeeServiceEntities2 context = new DBModels.BeeServiceEntities2();
             Data.ServiceRequest serRequest = context.ServiceRequests.Find(serviceRequestId);
@@ -154,32 +256,202 @@ namespace BeeCarService.Controllers
             return JsonConvert.SerializeObject(lstLandmarks, settings);
         }
 
-        public JsonResult GetServiceRequests()
+        public ActionResult DelayServiceRequests(int[] serviceRequestIds)
+        {
+            if (serviceRequestIds == null)
+                return Json(new { success = "false" }); ;
+
+            List<int> serRequestIdsList = new List<int>(serviceRequestIds);
+            DBModels.BeeServiceEntities2 context = new DBModels.BeeServiceEntities2();
+            List<Data.ServiceRequest> serviceRequests = context.ServiceRequests.Where(x => serRequestIdsList.Contains(x.ID)).ToList();
+            List<DateTime> days = new List<DateTime>();
+            //Dictionary<DateTime, Data.ServiceRequest> delayDayRequestsMap = new Dictionary<DateTime, DBModels.ServiceRequest>();
+            foreach (var serviceRequest in serviceRequests)
+            {
+                days.Add(serviceRequest.ServiceStartTime.Date);
+            };
+            foreach (DateTime day in days)
+            {
+                List<Data.ServiceRequest> allDayServiceRequests = context.ServiceRequests.Where(x => DbFunctions.TruncateTime(x.ServiceStartTime) == day.Date).OrderBy(x => x.ServiceTeamID).ThenBy(x => x.ServiceStartTime).ToList();
+                int lastTeamId = 0;
+                DateTime lastReqEndTime = DateTime.MinValue;
+                foreach (var serviceRequest in allDayServiceRequests)
+                {
+                    if (lastTeamId != serviceRequest.ServiceTeamID)
+                    {
+                        lastTeamId = (int)serviceRequest.ServiceTeamID;
+                        lastReqEndTime = DateTime.MinValue;
+                    }
+                    if (serRequestIdsList.Contains(serviceRequest.ID))
+                    {
+                        serviceRequest.ServiceStartTime = serviceRequest.ServiceStartTime.AddMinutes(30);
+                        serviceRequest.ServiceEndTime = ((DateTime)serviceRequest.ServiceEndTime).AddMinutes(30);
+
+                    }
+                    if (DateTime.Compare(lastReqEndTime, serviceRequest.ServiceStartTime) > 0)
+                    {
+                        TimeSpan span = lastReqEndTime.Subtract(serviceRequest.ServiceStartTime);
+                        serviceRequest.ServiceStartTime = lastReqEndTime;
+                        serviceRequest.ServiceEndTime = ((DateTime)serviceRequest.ServiceEndTime).AddMinutes(span.Minutes);
+                    }
+                    lastReqEndTime = (DateTime)serviceRequest.ServiceEndTime;
+                };
+                context.SaveChanges();
+            };
+            return Json(new { success = "true" });
+        }
+
+        public JsonResult GetServiceRequests(ServiceRequestCriteriaDto searchCriteria)
         {
             DBModels.BeeServiceEntities2 context = new DBModels.BeeServiceEntities2();
-            var serviceRequests = from ServiceRequest in context.ServiceRequests select ServiceRequest;
-            if (Session["UserName"].ToString()!="admin")
+            var predicate = PredicateBuilder.True<Data.ServiceRequest>();
+            if (Session["UserName"].ToString() != "admin")
             {
                 int customerID = Convert.ToInt32(Session["CustomerID"]);
-                serviceRequests = serviceRequests.Where(a => a.CustomerID.Equals(customerID));
+                predicate = predicate.And(a => a.CustomerID == customerID);
             }
+            if (searchCriteria != null)
+            {
+                if (searchCriteria.selectedTeamId != 0)
+                {
+                    int selectedTeamId = Convert.ToInt32(searchCriteria.selectedTeamId);
+                    predicate = predicate.And(a => a.ServiceTeamID == selectedTeamId);
+                }
+                if (searchCriteria.selectedDate != null)
+                {
+                    DateTime selectedDate = DateTime.ParseExact(searchCriteria.selectedDate, "yyyyMMdd", null);
+                    predicate = predicate.And(a => DbFunctions.TruncateTime(a.ServiceStartTime) == selectedDate.Date);
+                    // a => DbFunctions.TruncateTime(a.ServiceStartTime) == selectedDate.Date
+                }
+            }
+
+            int countOfRecords = context.ServiceRequests.AsExpandable().Where(predicate).Count();
+            List<Data.ServiceRequest> serviceRequests = new List<Data.ServiceRequest>();
+            if (searchCriteria != null && searchCriteria.currentPage != 0)
+            {
+                serviceRequests = context.ServiceRequests.AsExpandable().Where(predicate).OrderByDescending(x => x.ServiceStartTime).Skip(20 * (searchCriteria.currentPage - 1)).Take(20).ToList();
+            }
+            else
+            {
+                serviceRequests = context.ServiceRequests.AsExpandable().Where(predicate).ToList();
+            }
+
             List<ServiceRequest> lstServiceReqs = new List<ServiceRequest>();
             foreach (var serviceRequest in serviceRequests)
             {
                 ServiceRequest serviceRequestDto = new ServiceRequest();
                 serviceRequestDto.ID = serviceRequest.ID;
                 serviceRequestDto.StartTime = serviceRequest.ServiceStartTime;
+                serviceRequestDto.FormattedStartTime = serviceRequest.ServiceStartTime.ToString("dd-MMM-yyyy hh:mm tt");
                 serviceRequestDto.Status = serviceRequest.Status;
                 serviceRequestDto.CustomerName = serviceRequest.BeeUser.FullName;
+                serviceRequestDto.CustomerAddress = serviceRequest.BeeUser.Address;
+                serviceRequestDto.CustomerEmail = serviceRequest.BeeUser.Email;
+                serviceRequestDto.CustomerPhone = serviceRequest.BeeUser.Phone;
+                serviceRequestDto.ServiceTeamId = (int)serviceRequest.ServiceTeamID;
                 serviceRequestDto.VehicleCount = serviceRequest.ServiceRequestVehicles.Count;
+                serviceRequestDto.Cost = iifDecimal(serviceRequest.ServiceCost);
                 lstServiceReqs.Add(serviceRequestDto);
             }
             JsonSerializerSettings settings = new JsonSerializerSettings()
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             };
-            string vehicleTypesJson = JsonConvert.SerializeObject(lstServiceReqs, settings);
-            return Json(vehicleTypesJson, JsonRequestBehavior.AllowGet);
+            string serviceRequestsJson = JsonConvert.SerializeObject(lstServiceReqs, settings);
+            string finalResultJson = "{\"count\":" + countOfRecords + ", \"records\":" + serviceRequestsJson + "}";
+            return Json(finalResultJson, JsonRequestBehavior.AllowGet);
+        }
+
+        private decimal iifDecimal(decimal? dbValue)
+        {
+            if (dbValue == null)
+                return 0;
+            return dbValue.Value;
+        }
+
+        public JsonResult GetAllServiceTeams()
+        {
+            DBModels.BeeServiceEntities2 context = new DBModels.BeeServiceEntities2();
+            var serviceTeams = context.ServiceTeams;
+            List<ServiceTeamDto> allServiceTeams = new List<ServiceTeamDto>();
+            foreach (var serviceTeam in serviceTeams)
+            {
+                ServiceTeamDto serviceTeamDto = new ServiceTeamDto();
+                serviceTeamDto.ID = serviceTeam.ID;
+                serviceTeamDto.Name = serviceTeam.TeamName;
+                allServiceTeams.Add(serviceTeamDto);
+            }
+            JsonSerializerSettings settings = new JsonSerializerSettings()
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
+            string allTeamsJson = JsonConvert.SerializeObject(allServiceTeams, settings);
+            return Json(allTeamsJson, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetServiceRequest(int SRID = 0)
+        {
+            DBModels.BeeServiceEntities2 context = new DBModels.BeeServiceEntities2();
+            ServiceRequest objClientSR = new ServiceRequest();
+            SRClientModel srClient = new SRClientModel();
+            decimal SRCost = 0;
+            var serviceRequests = from ServiceRequest in context.ServiceRequests select ServiceRequest;
+
+            if (SRID != 0)
+            {
+
+                Data.ServiceRequest objDBSR = context.ServiceRequests.Where(a => a.ID == SRID).FirstOrDefault();
+
+                objClientSR.BeeUser = new BeeUser();
+                objClientSR.BeeUser.Id = objDBSR.BeeUser.Id;
+                objClientSR.BeeUser.Address = objDBSR.BeeUser.Address;
+                objClientSR.BeeUser.ContactPreference = objDBSR.BeeUser.ContactPreference;
+                objClientSR.BeeUser.Email = objDBSR.BeeUser.Email;
+                objClientSR.BeeUser.FullName = objDBSR.BeeUser.FullName;
+                objClientSR.BeeUser.LandmarkID = (int)objDBSR.BeeUser.LandmarkID.GetValueOrDefault(0);
+                objClientSR.BeeUser.Message = objDBSR.BeeUser.Message;
+                objClientSR.BeeUser.PaymentMode = objDBSR.BeeUser.PaymentMode;
+                objClientSR.BeeUser.Phone = objDBSR.BeeUser.Phone;
+                objClientSR.BeeUser.TextNotifications = objDBSR.BeeUser.TextNotifications;
+
+                objClientSR.ID = SRID;
+                objClientSR.CustomerID = objDBSR.CustomerID;
+                objClientSR.StartTime = objDBSR.ServiceStartTime;
+                objClientSR.ServiceDuration = (int)objDBSR.ServiceDuration;
+                objClientSR.EndTime = objDBSR.ServiceStartTime.AddMinutes((int)objClientSR.ServiceDuration);
+                objClientSR.Status = objDBSR.Status;
+
+                objClientSR.ServiceRequestVehicles = new List<ServiceRequestVehicle>();
+
+                foreach (Data.ServiceRequestVehicle objDBSRVehicle in objDBSR.ServiceRequestVehicles)
+                {
+                    decimal vehicleCost = 0;
+                    ServiceRequestVehicle objClientSRVehicle = new ServiceRequestVehicle();
+                    objClientSRVehicle.VehicleTypeID = objDBSRVehicle.VehicleTypeID;
+                    objClientSRVehicle.VehicleClassID = objDBSRVehicle.VehicleClassID;
+                    objClientSRVehicle.ServiceTypeID = objDBSRVehicle.ServiceTypeID;
+                    vehicleCost = objDBSRVehicle.ServiceType.Cost.Value;
+                    int addonCounter = 0;
+                    objClientSRVehicle.VehicleAddonIDs = new int[objDBSRVehicle.ServiceAddOns.Count];
+                    foreach (Data.ServiceAddOn objDBSRAddon in objDBSRVehicle.ServiceAddOns)
+                    {
+                        vehicleCost = vehicleCost + objDBSRAddon.AddOn.Cost.Value;
+                        objClientSRVehicle.VehicleAddonIDs[addonCounter] = (int)objDBSRAddon.AddOnID;
+                        addonCounter++;
+                    }
+                    objClientSRVehicle.Cost = vehicleCost;
+                    SRCost = SRCost + vehicleCost;
+                    objClientSR.ServiceRequestVehicles.Add(objClientSRVehicle);
+                }
+                objClientSR.Cost = SRCost;
+            }
+
+            JsonSerializerSettings settings = new JsonSerializerSettings()
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
+            string SRJson = JsonConvert.SerializeObject(objClientSR, settings);
+            return Json(SRJson, JsonRequestBehavior.AllowGet);
         }
 
         // GET: Home
@@ -225,18 +497,85 @@ namespace BeeCarService.Controllers
         // GET: Login
         public ActionResult LogOut()
         {
-            Session["LogedUserID"] = "";
-            Session["CustomerID"] = "";
-            Session["LogedUserFullname"] = "";
-            Session["UserName"] = "";
+            Session["LogedUserID"] = null;
+            Session["CustomerID"] = null;
+            Session["LogedUserFullname"] = null;
+            Session["UserName"] = null;
             return RedirectToAction("Home");
+        }
+
+        public JsonResult GetMasterList()
+        {
+
+            DBModels.BeeServiceEntities2 context = new DBModels.BeeServiceEntities2();
+            var vehicleTypes = context.VehicleTypes;
+            var vehicleClasses = context.VehicleClasses;
+            var serviceTypes = context.ServiceTypes;
+            var addOns = context.AddOns;
+
+            MasterList lstvehMasterList = new MasterList();
+            lstvehMasterList.VehicleTypes = new List<ClientVehicleType>();
+            foreach (var vehicleType in vehicleTypes)
+            {
+                ClientVehicleType clientVehicleType = new ClientVehicleType();
+                clientVehicleType.ID = vehicleType.ID;
+                clientVehicleType.Type = vehicleType.TYPE;
+                clientVehicleType.Status = vehicleType.Status;
+                lstvehMasterList.VehicleTypes.Add(clientVehicleType);
+            }
+
+            lstvehMasterList.VehicleClasses = new List<ClientVehicleClass>();
+            foreach (var vehicleClass in vehicleClasses)
+            {
+                ClientVehicleClass clientVehicleClass = new ClientVehicleClass();
+                clientVehicleClass.ID = vehicleClass.ID;
+                clientVehicleClass.Name = vehicleClass.Class;
+                clientVehicleClass.Status = vehicleClass.Status;
+                clientVehicleClass.VehichleTypeID = vehicleClass.VehichleTypeID;
+
+                lstvehMasterList.VehicleClasses.Add(clientVehicleClass);
+            }
+
+            lstvehMasterList.ServiceTypes = new List<ClientServiceType>();
+            foreach (var serviceType in serviceTypes)
+            {
+                ClientServiceType clientServiceType = new ClientServiceType();
+                clientServiceType.ID = serviceType.ID;
+                clientServiceType.Name = serviceType.ServiceType1;
+                clientServiceType.Duration = serviceType.Duration.Value;
+                clientServiceType.Cost = serviceType.Cost.Value;
+                clientServiceType.VehicleClassID = serviceType.VehicleClassID;
+                clientServiceType.Status= serviceType.Status;
+                lstvehMasterList.ServiceTypes.Add(clientServiceType);
+            }
+
+            lstvehMasterList.AddOns = new List<ClientAddon>();
+            foreach (var addOn in addOns)
+            {
+                ClientAddon clientAddOn = new ClientAddon();
+                clientAddOn.ID = addOn.ID;
+                clientAddOn.Name = addOn.AddOn1;
+                clientAddOn.Cost = addOn.Cost.Value;
+                clientAddOn.Duration = addOn.Duration.Value;
+                clientAddOn.ServiceTypeID = addOn.ServiceTypeID;
+                lstvehMasterList.AddOns.Add(clientAddOn);
+            }
+
+
+            JsonSerializerSettings settings = new JsonSerializerSettings()
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
+
+            string strMasterList = JsonConvert.SerializeObject(lstvehMasterList, settings);
+            return Json(strMasterList, JsonRequestBehavior.AllowGet);
         }
 
         private string GetMasterData()
         {
 
             DBModels.BeeServiceEntities2 context = new DBModels.BeeServiceEntities2();
-            var vehicleTypes = context.VehicleTypes;
+            var vehicleTypes = context.VehicleTypes.Where((e) =>e.Status==0);
 
             List<MasterData> lstvehMasterData = new List<MasterData>();
 
@@ -250,16 +589,16 @@ namespace BeeCarService.Controllers
 
                 //Adding vehicle classes
 
-                var vehicleClasses = context.VehicleClasses.Where((e) => e.VehichleTypeID == vehicleType.ID);
+                var vehicleClasses = context.VehicleClasses.Where((e) => e.VehichleTypeID == vehicleType.ID && e.Status == 0);
 
-                var classes = new List<VechicleClass>();
+                var classes = new List<VehicleClass>();
 
                 foreach (var vehicleClass in vehicleClasses)
                 {
-                    var vClass = new VechicleClass() { ID = vehicleClass.ID, Name = vehicleClass.Class};
+                    var vClass = new VehicleClass() { ID = vehicleClass.ID, Name = vehicleClass.Class };
 
                     //Adding service types to master data
-                    var serviceTypes = context.ServiceTypes.Where((e) => e.VehicleClassID == vehicleClass.ID);
+                    var serviceTypes = context.ServiceTypes.Where((e) => e.VehicleClassID == vehicleClass.ID && e.Status == 0);
 
                     var Types = new List<ServiceType>();
 
@@ -268,13 +607,13 @@ namespace BeeCarService.Controllers
                         var sType = new ServiceType() { ID = serviceType.ID, Name = serviceType.ServiceType1, Duration = serviceType.Duration.Value, Cost = serviceType.Cost.Value };
                         //Adding vehicle Addons
 
-                        var serviceAddOns = context.AddOns.Where((e) => e.ServiceTypeID == sType.ID);
+                        var serviceAddOns = context.AddOns.Where((e) => e.ServiceTypeID == sType.ID && e.Status == 0);
 
                         var addOns = new List<ServiceAddon>();
 
                         foreach (var serviceAddOn in serviceAddOns)
                         {
-                            addOns.Add(new ServiceAddon() { ID = serviceAddOn.ID, Name = serviceAddOn.AddOn1, Cost = serviceAddOn.Cost.Value });
+                            addOns.Add(new ServiceAddon() { ID = serviceAddOn.ID, Name = serviceAddOn.AddOn1, Cost = serviceAddOn.Cost.Value, Duration = serviceAddOn.Duration.Value });
                         }
 
                         sType.Addons = addOns;
@@ -304,10 +643,19 @@ namespace BeeCarService.Controllers
             return strMasterData;
         }
 
+
+        public JsonResult FetchCalendarEvents()
+        {
+
+            string strCalendar = GetCalendarEventsJSON();
+
+            return Json(strCalendar, JsonRequestBehavior.AllowGet);
+        }
+
         private string GetCalendarEventsJSON()
         {
 
-            List<TeamCalendar> lstTeamCalendar = GetCalendarEvents();
+            List<TeamCalendar> lstTeamCalendar = ListCalendarEvents();
 
             JsonSerializerSettings settings = new JsonSerializerSettings()
             {
@@ -319,7 +667,7 @@ namespace BeeCarService.Controllers
             return strCalendar;
         }
 
-        private List<TeamCalendar> GetCalendarEvents()
+        private List<TeamCalendar> ListCalendarEvents()
         {
 
             DBModels.BeeServiceEntities2 context = new DBModels.BeeServiceEntities2();
@@ -365,13 +713,14 @@ namespace BeeCarService.Controllers
         public JsonResult SaveServiceRequest(ServiceRequest SRequest)
         {
             string strMessage;
-            string strPassword="";
+            string strPassword = "";
             string strMailBody = "Your service request has been registered successfully. Please login using your emailid.";
             try
             {
                 DBModels.BeeServiceEntities2 context = new DBModels.BeeServiceEntities2();
                 DBModels.ServiceRequest serviceRequest;
                 int TotalDuration = 0;
+                decimal TotalCost = 0;
                 int serviceTeamID = 0;
 
                 if (SRequest.ID != 0)
@@ -388,7 +737,7 @@ namespace BeeCarService.Controllers
                 else
                 {
                     serviceRequest = new DBModels.ServiceRequest();
-                    if (SRequest.BeeUser.Id!=0)
+                    if (SRequest.BeeUser.Id != 0)
                     {
                         serviceRequest.BeeUser = context.BeeUsers.Where(a => a.Id.Equals(SRequest.BeeUser.Id)).FirstOrDefault();
                     }
@@ -397,7 +746,8 @@ namespace BeeCarService.Controllers
                         serviceRequest.BeeUser = new Data.BeeUser();
                         if (isEmailDuplicate(SRequest.BeeUser.Email))
                         {
-                            throw new ServiceException("This email ID has already been registered with us");
+                            serviceRequest.BeeUser = context.BeeUsers.Where(a => a.Email.Equals(SRequest.BeeUser.Email)).FirstOrDefault();
+                            SRequest.BeeUser.Id = serviceRequest.BeeUser.Id;
                         }
                     }
                 }
@@ -416,8 +766,8 @@ namespace BeeCarService.Controllers
                     serviceRequest.BeeUser.Email = SRequest.BeeUser.Email;
                     serviceRequest.BeeUser.FullName = SRequest.BeeUser.FullName;
                     serviceRequest.BeeUser.RegDate = System.DateTime.Now;
-                    strPassword = System.Web.Security.Membership.GeneratePassword(8, 0);
-                    strMailBody = strMailBody + "Your password is:" + strPassword;
+                    strPassword = "password"; // System.Web.Security.Membership.GeneratePassword(8, 0);
+                    strMailBody = strMailBody + "Your password is: " + strPassword;
                     serviceRequest.BeeUser.Password = strPassword;
                     serviceRequest.BeeUser.Username = "";
                 }
@@ -427,6 +777,7 @@ namespace BeeCarService.Controllers
                 {
                     var SReqVehicle = new Data.ServiceRequestVehicle();
                     TotalDuration = TotalDuration + (int)context.ServiceTypes.Find(SRVehicle.ServiceTypeID).Duration;
+                    TotalCost = TotalCost + context.ServiceTypes.Find(SRVehicle.ServiceTypeID).Cost.Value;
                     SReqVehicle.VehicleClassID = SRVehicle.VehicleClassID;
                     SReqVehicle.ServiceTypeID = SRVehicle.ServiceTypeID;
                     SReqVehicle.VehicleTypeID = SRVehicle.VehicleTypeID;
@@ -439,12 +790,16 @@ namespace BeeCarService.Controllers
                                 var SReqAddon = new Data.ServiceAddOn();
                                 SReqAddon.AddOnID = SRAddOnID;
                                 SReqVehicle.ServiceAddOns.Add(SReqAddon);
+                                TotalCost = TotalCost + context.AddOns.Find(SRAddOnID).Cost.Value;
+                                TotalDuration = TotalDuration + (int)context.AddOns.Find(SRAddOnID).Duration;
                             }
                         }
                     }
                     serviceRequest.ServiceRequestVehicles.Add(SReqVehicle);
                 }
+                TotalDuration = TotalDuration + 30;
                 serviceRequest.ServiceDuration = TotalDuration; //Service request in pending state
+                serviceRequest.ServiceCost = TotalCost;
                 serviceRequest.ServiceEndTime = SRequest.StartTime.AddMinutes(TotalDuration);
                 serviceTeamID = getAvailableServiceTeam(SRequest.StartTime, SRequest.StartTime.AddMinutes(TotalDuration));
                 if (serviceTeamID == 0)
@@ -455,14 +810,15 @@ namespace BeeCarService.Controllers
                     context.ServiceRequests.Add(serviceRequest);
 
                 context.SaveChanges();
-                if (SRequest.ID == 0)
-                    sendMail(strMailBody);
+//temporarily disabled email functionality
+//                if (SRequest.ID == 0)
+//                    sendMail(SRequest.BeeUser.Email, strMailBody);
             }
             catch (Exception e)
             {
                 strMessage = "{\"success\": 0, \"message\": \"Failed to save the service request. (" + e.Message + ")\"}";
                 return Json(strMessage, JsonRequestBehavior.AllowGet);
-            } 
+            }
             finally
             {
                 //sendMail(BuildServiceDetails(serviceRequest.ID));
@@ -482,8 +838,8 @@ namespace BeeCarService.Controllers
         private int getAvailableServiceTeam(DateTime ServiceStart, DateTime ServiceEnd)
         {
 
-            List<TeamCalendar> lstTeamCalendar = GetCalendarEvents();
-            for (int i=0; i<lstTeamCalendar.Count; i++)
+            List<TeamCalendar> lstTeamCalendar = ListCalendarEvents();
+            for (int i = 0; i < lstTeamCalendar.Count; i++)
             {
                 if (!IsOverlapping(ServiceStart, ServiceEnd, lstTeamCalendar[i].ServiceEvents))
                 {
@@ -496,7 +852,7 @@ namespace BeeCarService.Controllers
         private bool IsOverlapping(DateTime ServiceStart, DateTime ServiceEnd, List<ServiceEvent> EventArray)
         {
             // "calendar" on line below should ref the element on which fc has been called 
-            for (int i=0; i<EventArray.Count; i++)
+            for (int i = 0; i < EventArray.Count; i++)
             {
                 if (ServiceEnd > EventArray[i].Start && ServiceStart < EventArray[i].End)
                 {
@@ -511,15 +867,15 @@ namespace BeeCarService.Controllers
             return false;
         }
 
-        private void sendMail(string bodyText)
+        private void sendMail(string toAddress, string bodyText)
         {
             try
-            { 
+            {
                 MailMessage mail = new MailMessage();
                 SmtpClient MailClient = new SmtpClient("smtp.gmail.com");
 
                 mail.From = new MailAddress("beecarwash@gmail.com");
-                mail.To.Add("pramadasu@gmail.com");
+                mail.To.Add(toAddress);
                 mail.Subject = "Test Mail";
 
                 mail.Body = bodyText;
@@ -529,11 +885,11 @@ namespace BeeCarService.Controllers
                 MailClient.EnableSsl = true;
                 MailClient.Send(mail);
 
-                }
+            }
             catch (SmtpException e)
             {
                 Console.WriteLine(e.Message);
             }
-    }
+        }
     }
 }

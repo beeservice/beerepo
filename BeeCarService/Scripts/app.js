@@ -1,7 +1,7 @@
 
 
 (function () {
-    var app = angular.module('service', ['ngRoute', 'ngMessages']);
+    var app = angular.module('service', ['ngRoute', 'ngMessages', 'ngAnimate', 'ui.calendar', 'ui.bootstrap']);
 
     app.directive('orderSummary', function () {
         return {
@@ -10,7 +10,7 @@
         };
     });
 
-    app.controller('MasterDataController', function ($scope, $http) {
+    app.controller('MasterDataController', function ($scope, $http, $timeout) {
         $scope.requestsBuilt = false;
         $scope.vehicleCount = 1;
         $scope.currentStep = 1;
@@ -22,6 +22,7 @@
         $scope.eventSource = { events: [] };
         $scope.calendarEvents = serviceCalendarEvents;
         $scope.eventData = new Object();
+        $scope.dateSelectErrorMsg = '',
         $scope.selectedLandmark = {};
         $scope.totalDuration = 30;
         $scope.outputData = { vehicleCount: 1, startTime: '2015/09/18 00:00', beeUser: {}, serviceRequestVehicles: [] };
@@ -53,17 +54,27 @@
             return totalCost;
         }
 
-        $scope.calculateTotalDuration = function () {
+        $scope.calculateTotalDuration = function (bConvert) {
             var totalDuration = 0;
             var serviceType;
+            if (bConvert == undefined)
+                bConvert = false;
             for (var i = 0; i < $scope.outputData.serviceRequestVehicles.length; i++) {
                 var requestData = $scope.outputData.serviceRequestVehicles[i];
                 serviceType = $scope.getSelectedVehServiceType(requestData.vehicleTypeID, requestData.vehicleClassID, requestData.serviceTypeID);
                 totalDuration += serviceType.duration;
+                for (var j = 0; j < requestData.vehicleAddonIDs.length; j++) {
+                    totalDuration += $scope.getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID, requestData.serviceTypeID, requestData.vehicleAddonIDs[j]).duration;
+                }
             }
             totalDuration = totalDuration + 30
             $scope.totalDuration = totalDuration;
+            if (bConvert)
+                return $scope.convertDuration(totalDuration);
             return totalDuration;
+        }
+        $scope.convertDuration = function (totalDuration) {
+            return ((totalDuration - totalDuration % 60) / 60 + '.' + (totalDuration % 60));
         }
 
         $scope.buildRequests = function () {
@@ -89,7 +100,7 @@
             postData.beeUser = {};
             postData.StartTime = $scope.outputData.startTime;
             //new Date("October 13, 2015 11:13:00");
-            postData.serviceRequestVehicles = [];           
+            postData.serviceRequestVehicles = [];
             if ($scope.outputData.beeUser != undefined) {
                 var inputProfile = $scope.outputData.beeUser;
                 postData.beeUser.id = inputProfile.id;
@@ -97,7 +108,7 @@
                 postData.beeUser.address = inputProfile.address;
                 postData.beeUser.email = inputProfile.email;
                 postData.beeUser.phone = inputProfile.phone;
-                if ($scope.selectedLandmark.id != undefined && $scope.selectedLandmark.id != 0) 
+                if ($scope.selectedLandmark.id != undefined && $scope.selectedLandmark.id != 0)
                     postData.beeUser.landmarkID = $scope.selectedLandmark.id;
                 postData.beeUser.message = inputProfile.message;
                 postData.beeUser.contactPreference = inputProfile.contactPreference;
@@ -132,7 +143,7 @@
                 $scope.saveSRResponse = JSON.parse(response.data);
 
             }, function errorCallback(response) {
-                $scope.saveSRResponse = {success: 0, message: "Error submitting service request"};
+                $scope.saveSRResponse = { success: 0, message: "Error submitting service request" };
             });
 
         };
@@ -148,7 +159,7 @@
             return null;
         };
 
-//Service request select options
+        //Service request select options
 
         $scope.vehicleTypeSelected = function (requestData) {
             requestData.showVehicleClasses = true;
@@ -220,16 +231,14 @@
         };
 
 
-//Calendar event management
+        //Calendar event management
 
         $scope.loadRequests = function () {
 
             $scope.outputData = serverOutputData;
-            if ($scope.outputData.serviceRequestVehicles == undefined)
-            {
+            if ($scope.outputData.serviceRequestVehicles == undefined) {
                 $scope.outputData = { vehicleCount: 1, startTime: '2015/09/18 00:00', beeUser: {}, serviceRequestVehicles: [] };
-                if (serverOutputData.beeUser != undefined)
-                {
+                if (serverOutputData.beeUser != undefined) {
                     $scope.outputData.beeUser = serverOutputData.beeUser;
                     $scope.selectedLandmark = $scope.getLandmark($scope.outputData.beeUser.landmarkID);
                     $scope.userLoggedIn = 1;
@@ -249,13 +258,13 @@
 
             //INITIATE CALENDAR
             $('#calendar').fullCalendar({
-                header: { left: 'prev,next today', center: 'title', right: 'month,agendaWeek,agendaDay'},
+                header: { left: 'prev,next today', center: 'title', right: 'month,agendaWeek,agendaDay' },
                 defaultDate: Date.now(),
                 defaultView: "agendaWeek",
                 allDaySlot: false,
                 selectable: true,
                 selectHelper: true,
-                businessHours: { start:'9:00', end:'18:00', dow: [1, 2, 3, 4, 5]},
+                businessHours: { start: '9:00', end: '18:00', dow: [1, 2, 3, 4, 5] },
                 minTime: "09:00:00",
                 maxTime: "18:00:00",
                 eventDurationEditable: false,
@@ -268,28 +277,39 @@
                 unselectAuto: true,
                 select: function (start, end) {
                     $('#calendar').fullCalendar('unselect');
+                    $scope.dateSelectErrorMsg = '';
+                    $scope.$apply();
                     var title = "Your selection";
 
-                    if (Date.now() > start)
+                    if (Date.now() > start) {
+                        $scope.dateSelectErrorMsg = 'Selected date/time cannot be in the past.';
+                        $scope.$apply();
                         return 0;
+                    }
                     var startTime = start.format();
                     var endTime = end.add($scope.totalDuration - 30, "minutes").format();
-                    //                    if ($scope.isOverlapping(start, end.add($scope.totalDuration - 30, "minutes"), $('#calendar').fullCalendar('clientEvents')))
-                    if (!$scope.isSlotAvailable(startTime, endTime))
+                    if (moment(endTime).format('H') > 18) {
+                        $scope.dateSelectErrorMsg = "Your selected service time is beyond the day's working hours";
+                        $scope.$apply();
                         return 0;
+                    }
+
+                    if (!$scope.isSlotAvailable(startTime, endTime)) {
+                        $scope.dateSelectErrorMsg = 'No single team is available with the specified start time. Try changing the start time';
+                        $scope.$apply();
+                        return 0;
+                    }
 
                     if (title) {
-                        if ($scope.eventData.title == undefined)
-                        {
+                        if ($scope.eventData.title == undefined) {
                             $scope.eventData.id = 0;
                             $scope.eventData.title = title;
                             $scope.eventData.start = start;
                             $scope.eventData.end = end;
                             $('#calendar').fullCalendar('renderEvent', $scope.eventData, true); // stick? = true
                         }
-                        else
-                        {
-                            if ($('#calendar').fullCalendar('clientEvents', 0).length != 0){
+                        else {
+                            if ($('#calendar').fullCalendar('clientEvents', 0).length != 0) {
 
                                 $scope.eventData = $('#calendar').fullCalendar('clientEvents', 0)[0];
 
@@ -308,22 +328,22 @@
 
             $scope.findEmptySlots();
 
-            if ($scope.outputData.id > 0)
-            {
+            if ($scope.outputData.id > 0) {
                 $scope.totalDuration = $scope.outputData.serviceDuration;
                 $('#calendar').fullCalendar('select', $scope.outputData.startTime, moment($scope.outputData.startTime).add(30, 'minutes').format());
             }
 
             return 0;
         };
+        
+        $scope.displayError = function () {
+            return $scope.dateSelectErrorMsg;
+        }
 
-        $scope.resetEvent = function ()
-        {
+        $scope.resetEvent = function () {
             $('#calendar').fullCalendar('removeEvents', 0);
             $scope.eventData = {};
         }
-            
-        
 
         $scope.getLandmark = function (landmarkID) {
 
@@ -342,17 +362,16 @@
             for (var i = 0; i < $scope.calendarEvents.length; i++) {
                 var teamCalendar = $scope.calendarEvents[i];
 
-//                add 30 mins empty events to both ends
-                if (teamCalendar.serviceEvents.length > 0)
-                {
+                //                add 30 mins empty events to both ends
+                if (teamCalendar.serviceEvents.length > 0) {
                     var firstEvent = teamCalendar.serviceEvents[0];
                     var lastEvent = teamCalendar.serviceEvents[teamCalendar.serviceEvents.length - 1];
-                    var startSlot = moment.utc(firstEvent.start).subtract(30, "minutes").format();
-                    var endSlot = moment.utc(lastEvent.end).add(30, "minutes").format();
+                    var startSlot = moment.utc(firstEvent.start).subtract(90, "days").format();
+                    var endSlot = moment.utc(lastEvent.end).add(90, "days").format();
                     $scope.addFreeSlot(startSlot, moment.utc(firstEvent.start).format());
                     $scope.addFreeSlot(moment.utc(lastEvent.end).format(), endSlot);
                 }
-//              find gaps and add to empty slots
+                //              find gaps and add to empty slots
                 for (var j = 0; j < teamCalendar.serviceEvents.length - 1; j++) {
                     var event = teamCalendar.serviceEvents[j];
                     var nextEvent = teamCalendar.serviceEvents[j + 1];
@@ -360,7 +379,7 @@
                     var nd = moment.utc(event.end);
                     var diffMins;
                     diffMins = st.diff(nd, "minutes");
-                    if (diffMins >= $scope.totalDuration) 
+                    if (diffMins >= $scope.totalDuration)
                         $scope.addFreeSlot(nd.format(), st.format());
                 }
             }
@@ -377,11 +396,9 @@
                 //find next event with endtime greater than cur events end time
                 while (i < freeCount && curEvent.end >= $scope.freeSlots.events[i].end)
                     i++;
-                if (i < freeCount - 1)
-                {
+                if (i < freeCount - 1) {
                     var nextEvent = $scope.freeSlots.events[i];
-                    if(curEvent.end<nextEvent.start)
-                    {
+                    if (curEvent.end < nextEvent.start) {
                         var busyEvent = { title: "N/A", start: curEvent.end, end: nextEvent.start };
                         $scope.busySlots.events.push(busyEvent);
                     }
@@ -390,8 +407,8 @@
             }
 
             $('#calendar').fullCalendar('removeEvents');
-//            $('#calendar').fullCalendar('refetchEvents');
             $('#calendar').fullCalendar('addEventSource', $scope.busySlots);
+            $('#calendar').fullCalendar('rerenderEvents');
             return 0;
         };
 
@@ -432,6 +449,13 @@
 
         };
 
+        $scope.renderCalender = function () {
+            $timeout(function () {
+                $('#calendar').fullCalendar('refetchEvents');
+                $('#calendar').fullCalendar('render');
+            });
+        };
+
         $scope.isSlotAvailable = function (start, end) {
 
             for (var i = 0; i < $scope.calendarEvents.length; i++) {
@@ -466,17 +490,198 @@
 
     });
 
-    app.controller('ListServiceRequestCtrl', function ($scope, $http, $window) {
+    app.controller('ListServiceRequestCtrl', function ($scope, $http, $compile, $timeout, $window, uiCalendarConfig) {
 
         $scope.busySlots = { events: [] };
         $scope.eventSource = { events: [] };
         $scope.eventData = new Object();
         $scope.adminTab = 1;
+        $scope.EOD = new Date();
         $scope.vehicleCost = 0;
         $scope.selectedTeam = 0;
         $scope.selectedServiceID = 0;
         $scope.selectedServiceData = {};
         $scope.masterList = {};
+        $scope.selVehTypeID = 1;
+        $scope.selVehClassID = 1;
+        $scope.newMasterDataParentID = 0;
+        $scope.newMasterDataPath = '';
+        $scope.newMasterDataType = -1;
+        $scope.selServiceTypeID = 1;
+        $scope.selectedServices = [];
+        $scope.criteria = {};
+        $scope.allTeams = [];
+        $scope.calendarDateOptions = {
+            formatYear: 'yy',
+            startingDay: 1
+        };
+        $scope.calendarDateFormat = 'dd-MMM-yyyy';
+        $scope.dateCriteriaCalendarOpened = false;
+        $scope.firstPage = 1;
+        $scope.noOfPages = 1;
+        $scope.criteria.currentPage = 1;
+
+        $scope.navigateToPage = function (pageNo) {
+            $scope.criteria.currentPage = pageNo;
+            if (pageNo > ($scope.firstPage + 4)) {
+                $scope.firstPage = pageNo - 4;
+            }
+            if (pageNo < $scope.firstPage) {
+                $scope.firstPage = pageNo;
+            }
+        };
+
+        $scope.getAllTeams = function () {
+            $http.get('/Service/GetAllServiceTeams').success(function (response) {
+                $scope.allTeams = JSON.parse(response);
+            });
+        };
+
+        $scope.clearServiceRequestsFilterCriteria = function () {
+            $scope.criteria = {};
+        }
+
+        $scope.toggleServiceRequestSelection = function (serviceRequestId) {
+            var idx = $scope.selectedServices.indexOf(serviceRequestId);
+            if (idx > -1) {
+                $scope.selectedServices.splice(idx, 1);
+            } else {
+                $scope.selectedServices.push(serviceRequestId);
+            }
+        };
+
+        $scope.delaySelectedServices = function () {
+            if ($scope.selectedServices.length == 0){
+                bootbox.alert("Please select requests to delay");
+                return 0;
+            }
+
+            $http.post("/Service/DelayServiceRequests", { serviceRequestIds: $scope.selectedServices })
+                .then(function (response) {
+                        $scope.getExistingServiceRequests();
+                    },
+                function () {
+                    bootbox.alert("Delaying Sevice request(s) failed");
+                });
+            $http.get('/Service/FetchCalendarEvents').success(function (response) {
+                serviceCalendarEvents = JSON.parse(response);
+                $scope.loadCalendar();
+            });
+
+        };
+
+
+        $scope.getSRObject = function (objCol, objID) {
+            for (var i = 0; i < objCol.length; i++) {
+                if (objCol[i].id == objID)
+                    return objCol[i];
+            }
+        };
+
+        $scope.editServiceRequest = function (serviceRequestId) {
+            parent.location = "/Service/RequestService?SRID=" + serviceRequestId;
+        };
+
+        $scope.isStarted = function (SRTime) {
+
+            if (SRTime < $scope.EOD)
+                return true;
+            return false;
+
+        };
+
+        $scope.loadMasterList = function () {
+            $http.get('/Service/GetMasterList').success(function (response) {
+                $scope.masterList = JSON.parse(response);
+            });
+        };
+
+        $scope.getExistingServiceRequests = function (isPaginationEnabled) {
+            $scope.selectedServices = [];
+            var paramString = "";
+            if ($scope.criteria.selectedTeamId != null && $scope.criteria.selectedTeamId != undefined && $scope.criteria.selectedTeamId != 0) {
+                paramString += "selectedTeamId=" + $scope.criteria.selectedTeamId;
+            }
+            if (isPaginationEnabled) {
+                if (paramString != "") {
+                    paramString += "&";
+                }
+                paramString += "currentPage=" + $scope.criteria.currentPage;
+            }
+            if ($scope.criteria.selectedDate != null && $scope.criteria.selectedDate != undefined) {
+                var dateObj = new Date($scope.criteria.selectedDate);
+                var yyyy = dateObj.getFullYear().toString();
+                var mm = (dateObj.getMonth() + 1).toString();
+                var dd = dateObj.getDate().toString();
+                var dateString = yyyy + (mm[1] ? mm : "0" + mm[0]) + (dd[1] ? dd : "0" + dd[0]);
+                if (paramString != "") {
+                    paramString += "&";
+                }
+                paramString += "selectedDate=" + dateString;
+            }
+            if (paramString != "") {
+                paramString = "?" + paramString;
+            }
+            $http.get('/Service/GetServiceRequests' + paramString).success(function (response) {
+                var responseJson = JSON.parse(response);
+                $scope.existingServiceRequests = responseJson.records;
+                $scope.noOfRecords = responseJson.count;
+                $scope.noOfPages = Math.floor(($scope.noOfRecords-1) / 20) + 1;
+            });
+        };
+
+        $scope.convertDuration = function (totalDuration) {
+            return (Math.floor(totalDuration / 60) + '.' + (totalDuration % 60));
+        }
+
+        $scope.statusList = ["New", "In Progress", "Completed"];
+
+        $scope.editServiceRequest = function (serviceRequestId) {
+            parent.location = "/Service/RequestService?SRID=" + serviceRequestId;
+        };
+
+        $scope.updateServiceRequestStatus = function (serviceRequestId, status) {
+            $http.post("/Service/UpdateServiceRequestStatus", { serviceRequestId: serviceRequestId, status: status });
+            $scope.getExistingServiceRequests();
+        };
+
+        $scope.enableMasterData = function (MasterType, MasterID, status) {
+            $http.post("/Service/UpdateMasterDataStatus", { MasterType: MasterType, MasterID: MasterID, Status: status });
+            $scope.loadMasterList();
+        };
+
+        $scope.addMasterData = function (masterType, strData) {
+            $http.post("/Service/AddMasterData", { MasterType: masterType, ParentID: $scope.newMasterDataParentID, MasterData: strData });
+            $scope.loadMasterList();
+            $scope.newMasterDataType = -1;
+        };
+
+        $scope.cancelServiceRequest = function (serviceRequestId) {
+            bootbox.confirm("Are you sure to cancel the service request?", function (result) {
+                if (result) {
+                    $http.post("/Service/CancelServiceRequest", { serviceRequestId: serviceRequestId })
+                    .then(function (response) {
+                        $scope.getExistingServiceRequests();
+                        bootbox.alert("Sevice request cancelled successfully");
+                    },
+                    function () {
+                        bootbox.alert("Cancellation of Sevice request failed");
+                    });
+                } else {
+
+                }
+
+            });
+
+        };
+
+        $scope.status = {
+            opened: false
+        };
+
+        $scope.openDateCriteriaCalendar = function ($event) {
+            $scope.status.opened = true;
+        };
 
         //Calendar event management
 
@@ -504,10 +709,9 @@
                         $scope.selectedServiceData = JSON.parse(response);
                     });
                 }
-        });
+            });
 
             $scope.loadCalendarEvents();
-
             return 0;
         };
 
@@ -517,8 +721,7 @@
 
             for (var i = 0; i < $scope.calendarEvents.length; i++) {
                 var teamCalendar = $scope.calendarEvents[i];
-                if ($scope.selectedTeam == 0 || $scope.selectedTeam == teamCalendar.serviceTeamID)
-                {
+                if ($scope.selectedTeam == 0 || $scope.selectedTeam == teamCalendar.serviceTeamID) {
                     for (var j = 0; j < teamCalendar.serviceEvents.length; j++) {
                         var calEvent = {};
                         var event = teamCalendar.serviceEvents[j];
@@ -539,60 +742,17 @@
 
         };
 
-        $scope.getSRObject = function (objCol, objID) {
-            for (var i=0; i<objCol.length; i++) {
-                if (objCol[i].id == objID)
-                    return objCol[i];
-            }
+        $scope.renderCalender = function () {
+            $timeout(function () {
+                $('#calendar').fullCalendar('refetchEvents');
+                $('#calendar').fullCalendar('render');
+            });
         };
-
-        $scope.loadMasterList = function () {
-            $http.get('/Service/GetMasterList').success(function (response) {
-                $scope.masterList = JSON.parse(response);
-            });
-        }
-
-        $scope.getExistingServiceRequests = function () {
-            $http.get('/Service/GetServiceRequests').success(function (response) {
-                $scope.existingServiceRequests = JSON.parse(response);
-            });
-        }
-
-        $scope.statusList = ["New", "In Progress", "Completed"];
-
-        $scope.editServiceRequest = function (serviceRequestId) {
-            parent.location = "/Service/RequestService?SRID=" + serviceRequestId;
-        }
-
-        $scope.updateServiceRequestStatus = function (serviceRequestId, status) {
-            $http.post("/Service/UpdateServiceRequestStatus", { serviceRequestId: serviceRequestId, status: status });
-            $scope.getExistingServiceRequests();
-        }
-
-        $scope.cancelServiceRequest = function (serviceRequestId) {
-            bootbox.confirm("Are you sure to cancel the service request?", function (result) {
-                if (result) {
-                    $http.post("/Service/CancelServiceRequest", { serviceRequestId: serviceRequestId })
-                    .then(function (response) {
-                        $scope.getExistingServiceRequests();
-                        bootbox.alert("Sevice request cancelled successfully");
-                    },
-                    function () {
-                        bootbox.alert("Cancellation of Sevice request failed");
-                    });
-                } else {
-
-                }
-
-            });
-
-        }
-
-    });
+});
 
     app.controller('LoginController', function ($scope, $http, $window) {
-        $scope.username = "pramadasu@gmail.com";
-        $scope.password = "password";
+        $scope.username = "beeadmin@gmail.com";
+        $scope.password = "";
         $scope.processLogin = function () {
             $http.post("/Service/Login", { Username: $scope.username, Password: $scope.password })
                     .then(function (response) {
@@ -602,8 +762,15 @@
                     function () {
                         $scope.loginFailed = true;
                     });
-        }
+        };
+
     });
 
 
 })();
+
+$("#caldiv").click(function () {
+
+    $("#hidden-div").show("fade", 3000);
+    $('#calendar').show('fade', { queue: false }, 3000).fullCalendar('render');
+});

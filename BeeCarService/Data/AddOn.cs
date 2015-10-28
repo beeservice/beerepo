@@ -24,6 +24,8 @@ namespace BeeCarService.Data
         public string AddOn1 { get; set; }
         public int ServiceTypeID { get; set; }
         public Nullable<decimal> Cost { get; set; }
+        public Nullable<int> Duration { get; set; }
+        public short Status { get; set; }
     
         public virtual ServiceType ServiceType { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

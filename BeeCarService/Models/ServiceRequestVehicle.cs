@@ -11,5 +11,6 @@ namespace BeeCarService.Models
         public int VehicleClassID { get; set; }
         public int ServiceTypeID { get; set; }
         public int [] VehicleAddonIDs { get; set; }
+        public decimal Cost { get; set; }
     }
 }

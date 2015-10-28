@@ -3,17 +3,92 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
 @using (Html.BeginForm("Home", "Service", FormMethod.Post))
 {
+
     <div class="main_container">
-        <div class="btn_scrn">
-            <div class="row">
-                <div class="col-sm-7 col-sm-offset-5 col-md-5 col-md-offset-7">
-                    <ul class="list-inline main_btns">
-                        <li><a href="/Service/listServiceRequests" class="btn btn-border btn-lg">MY Service Requests</a></li>
-                        <li><a href="/Service/RequestService" class="btn btn-white btn-lg">Request a Service</a></li>
-                    </ul>
+
+        <div class="row">
+            <div class="col-sm-12 col-md-12">
+                <ul class="list-inline main_btns">
+                    <li><a href="/Service/RequestService" class="btn btn-white btn-sm">Request a Service</a></li>
+                    <li><a href="/Service/listServiceRequests" class="btn btn-border btn-sm">MY Service Requests</a></li>
+                </ul>
+            </div>
+        </div>
+        <p class="title1">Welcome to beeprotection!</p>
+        <p class="title2" style="padding:20px;">>خدمة غسيل سيارات Bee Protection Car wash , polish & protection -at your step-door. Request online or Call & book your appointment اتصل واحجز موعدك 98009966/77 beeprotection.net.</p>
+        <div class="row">
+            <div class="col-sm-6 col-md-6" style="padding:20px;">
+                <div class="row">
+                    <div class="col-sm-1 col-md-1" style="padding:20px;"></div>
+                    <div class="col-sm-6 col-md-6">
+                        <img src="~/Content/Images/beewash.jpg" style="border:solid thin" width="280" height="270" />
+                    </div>
+                    <div class="col-sm-5 col-md-5">
+                        " بيي ووش bee wash " و هي خدمة تتضمن غسيل خارجي + تنظيف داخلي " مكنسة + مواد تنظيف ايطالية صديقة للبيئة " ...
+                        السعر :
+                        الصالون : 5.250 kd
+                        الجيب : 6:500 kd
+
+                        <p>Service Duration : 1hr</p>
+                        <p>Washing body and interior</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-6" style="padding:20px;">
+                <div class="row">
+                    <div class="col-sm-6 col-md-6">
+                        <img src="~/Content/Images/beewax.jpg" style="border:solid thin" width="280" height="270" />
+                    </div>
+                    <div class="col-sm-5 col-md-5">
+                        " بيي واكس bee wax " و هي خدمة تتضمن غسيل خارجي + غسيل داخي + تنظيف و تلميع و ازالة البقع من على الأرضيات بمواد خاصة صديقة للبيئة + معطر + تلميع الرنجات و التواير + طبقة شمع wax على السيارة من الخارج ...
+                        السعر :
+                        الصالون : 12.250 kd
+                        الجيب : 15.500 kd
+
+                        <p>Service Duration : 1.5hrs</p>
+                        <p>Body + interior + carpets + wax + perfume + tires and rings</p>
+                    </div>
+                    <div class="col-sm-1 col-md-1" style="padding:20px;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6 col-md-6" style="padding:20px;">
+                <div class="row">
+                    <div class="col-sm-1 col-md-1" style="padding:20px;"></div>
+                    <div class="col-sm-6 col-md-6">
+                        <img src="~/Content/Images/beeprotect.jpg" style="border:solid thin" width="280" height="270" />
+                    </div>
+                    <div class="col-sm-5 col-md-5">
+                        " بيي بروتكت bee protect " و هي خدمة تتضمن غسيل خارجي + غسيل داخي + تنظيف و تلميع و ازالة البقع من على الأرضيات بمواد خاصة صديقة للبيئة + تنظيف و تعقيم فتحات التكييف بمواد خاصة صديقة للبيئة + تلميع المكينة بواد خاصة صديقة للبيئة + معطر + تلميع الرنجات و التواير + طبقة شمع wax على السيارة من الخارج ...
+                        السعر :
+                        الصالون : 15.500 kd
+                        الجيب : 19.500 kd
+
+                        <p>Service Duration : 1.5hrs</p>
+                        <p>Body + wax</p>
+                        <p>Interior + carpets + A/Cs + tires + perfume + waxing rings + engine</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-6" style="padding:20px">
+                <div class="row">
+                    <div class="col-sm-6 col-md-6">
+                        <img src="~/Content/Images/queenwash.jpg" style="border:solid thin" width="280" height="270" />
+                    </div>
+                    <div class="col-sm-5 col-md-5">
+                        " كوين ووش queen wash " و هي خدمة تتضمن تنظيف داخلي للسيارة ( تنظيف و تلميع و ازالة البقع من على المقاعد و الأرضيات و الأبواب من الداخل و السقف و الطبلوم ) + تنظيف و تلميع و ازالة البقع من صندوق السيارة + تنظيف و تعقيم فتحات التكييف + معطر - و غسيل خارجي ( 3 طبقات بوليش + طبقة شمع wax تنظيف + تلميع الرنجات و التواير ) + تلميع مكينة السيارة ... طبعاً كل هذا عن طريق مواد خاصة صديقة للبيئة ...
+                        السعر :
+                        الصالون : 34.750 kd
+                        الجيب : 44.500 kd
+
+                        <p>Service Duration : 4hrs</p>
+                        <p>Body + wax + polish</p>
+                        <p>Interior + wax + carpets + ceiling + pedals + trunk + perfume + waxing tires and rings + waxing engine</p>
+                    </div>
+                    <div class="col-sm-1 col-md-1" style="padding:20px;"></div>
                 </div>
             </div>
         </div>
