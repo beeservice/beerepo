@@ -24,6 +24,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -195,6 +196,7 @@
       <DependentUpon>BeeServiceConnection.edmx</DependentUpon>
       <LastGenOutput>BeeServiceConnection.Context.cs</LastGenOutput>
     </Content>
+    <Content Include="Data\BeeServiceConnection.edmx.sql" />
     <Content Include="Data\BeeServiceConnection.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>BeeServiceConnection.edmx</DependentUpon>
@@ -239,6 +241,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="ClientModels\ClientLandmark.cs" />
+    <Compile Include="ClientModels\ClientServiceTeam.cs" />
     <Compile Include="ClientModels\ClientVehicleType.cs" />
     <Compile Include="ClientModels\ClientAddon.cs" />
     <Compile Include="ClientModels\ClientServiceType.cs" />

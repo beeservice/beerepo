@@ -11,6 +11,8 @@ namespace BeeCarService.ClientModels
         public List<ClientVehicleClass> VehicleClasses { get; set; }
         public List<ClientServiceType> ServiceTypes { get; set; }
         public List<ClientAddon> AddOns { get; set; }
+        public List<ClientServiceTeam> ServiceTeams { get; set; }
+        public List<ClientLandmark> Landmarks { get; set; }
 
     }
 }

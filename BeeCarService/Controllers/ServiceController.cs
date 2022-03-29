@@ -214,6 +214,18 @@ namespace BeeCarService.Controllers
                         Addon.Duration = addon.Duration;
                         context.AddOns.Add(Addon);
                         break;
+                    case 4: //Vehicles
+                        ClientServiceTeam sTeam = (ClientServiceTeam)JsonConvert.DeserializeObject(MasterData, typeof(ClientServiceTeam));
+                        DBModels.ServiceTeam serviceTeam = new DBModels.ServiceTeam();
+                        serviceTeam.TeamName = sTeam.Name;
+                        context.ServiceTeams.Add(serviceTeam);
+                        break;
+                    case 5: //Vehicles
+                        ClientLandmark landmark = (ClientLandmark)JsonConvert.DeserializeObject(MasterData, typeof(ClientLandmark));
+                        DBModels.Landmark lMark = new DBModels.Landmark();
+                        lMark.LandmarkLocation = landmark.Name;
+                        context.Landmarks.Add(lMark);
+                        break;
                     default:
                         break;
                 }
@@ -512,6 +524,8 @@ public ActionResult CancelServiceRequest(int serviceRequestId)
             var vehicleClasses = context.VehicleClasses;
             var serviceTypes = context.ServiceTypes;
             var addOns = context.AddOns;
+            var landmarks = context.Landmarks.OrderBy(x => x.LandmarkLocation);
+            var serviceTeams = context.ServiceTeams;
 
             MasterList lstvehMasterList = new MasterList();
             lstvehMasterList.VehicleTypes = new List<ClientVehicleType>();
@@ -558,7 +572,28 @@ public ActionResult CancelServiceRequest(int serviceRequestId)
                 clientAddOn.Cost = addOn.Cost.Value;
                 clientAddOn.Duration = addOn.Duration.Value;
                 clientAddOn.ServiceTypeID = addOn.ServiceTypeID;
+                clientAddOn.Status = addOn.Status;
                 lstvehMasterList.AddOns.Add(clientAddOn);
+            }
+
+            lstvehMasterList.Landmarks = new List<ClientLandmark>();
+            foreach (var landmark in landmarks)
+            {
+                ClientLandmark clientLandmark = new ClientLandmark();
+                clientLandmark.ID = landmark.ID;
+                clientLandmark.Name = landmark.LandmarkLocation;
+                clientLandmark.Status = landmark.Status;
+                lstvehMasterList.Landmarks.Add(clientLandmark);
+            }
+
+            lstvehMasterList.ServiceTeams = new List<ClientServiceTeam>();
+            foreach (var sTeam in serviceTeams)
+            {
+                ClientServiceTeam clientSTeam = new ClientServiceTeam();
+                clientSTeam.ID = sTeam.ID;
+                clientSTeam.Name = sTeam.TeamName;
+                clientSTeam.Status = sTeam.Status;
+                lstvehMasterList.ServiceTeams.Add(clientSTeam);
             }
 
 
@@ -644,18 +679,18 @@ public ActionResult CancelServiceRequest(int serviceRequestId)
         }
 
 
-        public JsonResult FetchCalendarEvents()
+        public JsonResult FetchCalendarEvents(bool bAll = false)
         {
 
-            string strCalendar = GetCalendarEventsJSON();
+            string strCalendar = GetCalendarEventsJSON(bAll);
 
             return Json(strCalendar, JsonRequestBehavior.AllowGet);
         }
 
-        private string GetCalendarEventsJSON()
+        private string GetCalendarEventsJSON(bool bAll = false)
         {
 
-            List<TeamCalendar> lstTeamCalendar = ListCalendarEvents();
+            List<TeamCalendar> lstTeamCalendar = ListCalendarEvents(bAll);
 
             JsonSerializerSettings settings = new JsonSerializerSettings()
             {
@@ -667,23 +702,33 @@ public ActionResult CancelServiceRequest(int serviceRequestId)
             return strCalendar;
         }
 
-        private List<TeamCalendar> ListCalendarEvents()
+        private List<TeamCalendar> ListCalendarEvents(bool bAll=false)
         {
 
             DBModels.BeeServiceEntities2 context = new DBModels.BeeServiceEntities2();
-
             List<TeamCalendar> lstTeamCalendar = new List<TeamCalendar>();
+            DateTime dtStart, dtEnd;
+            
+            if (bAll)
+            {
+                dtStart = Convert.ToDateTime("01/01/1900");
+                dtEnd = System.DateTime.Today.AddYears(3);
+            }
+            else
+            {
+                dtStart = System.DateTime.Today.AddDays(-15);
+                dtEnd = System.DateTime.Today.AddDays(30);
+            }
 
             var serviceTeams = context.ServiceTeams;
-
             foreach (var serviceTeam in serviceTeams)
             {
                 TeamCalendar tCal = new TeamCalendar();
                 tCal.ServiceTeamID = serviceTeam.ID;
                 tCal.ServiceTeamName = serviceTeam.TeamName;
                 tCal.ServiceEvents = new List<ServiceEvent>();
-
-                foreach (var serviceRequest in serviceTeam.ServiceRequests.OrderBy(a => a.ServiceStartTime))
+                
+                foreach (var serviceRequest in serviceTeam.ServiceRequests.Where(e=>e.ServiceStartTime>dtStart & e.ServiceStartTime < dtEnd).OrderBy(a => a.ServiceStartTime))
                 {
                     ServiceEvent sEvent = new ServiceEvent();
                     sEvent.ServiceRequestID = serviceRequest.ID;
@@ -876,7 +921,7 @@ public ActionResult CancelServiceRequest(int serviceRequestId)
 
                 mail.From = new MailAddress("beecarwash@gmail.com");
                 mail.To.Add(toAddress);
-                mail.Subject = "Test Mail";
+                mail.Subject = "Test Mail to be sent";
 
                 mail.Body = bodyText;
 

@@ -96,7 +96,7 @@
                                         <h4>Choose Date/Time</h4>
                                         <div id='calendar'></div>
                                         <div class="row">
-                                            <div class="col-md-12 text-warning"><span style="color:red">{{dateSelectErrorMsg}}</span></div>
+                                            <div class="col-sm-12 text-warning"><span style="color:red">{{dateSelectErrorMsg}}</span></div>
                                         </div>
                                     </div>
                                     <div class="col-sm-1"></div>
@@ -241,7 +241,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-7 col-sm-offset-5 col-md-5 col-md-offset-7">
+                                    <div class="col-sm-7 col-sm-offset-5 col-sm-5 col-sm-offset-7">
                                         <span class="pull-right">
                                             <a href="/Service/listServiceRequests" class="btn btn-link btn-sm">MY Service Requests</a>
                                         </span>
@@ -263,54 +263,54 @@
                         </div>
                         <div ng-show="outputData.serviceRequestVehicles.length>0">
                             <div class="row mainhead">
-                                <div class="col-md-3">Vehicle</div>
-                                <div class="col-md-4">Service</div>
-                                <div class="col-md-5">
+                                <div class="col-sm-3">Vehicle</div>
+                                <div class="col-sm-4">Service</div>
+                                <div class="col-sm-5">
                                     <div class="row">
-                                        <div class="col-md-6 mainhead">Time(hrs)</div>
-                                        <div class="col-md-6 mainhead">Cost(KD)</div>
+                                        <div class="col-sm-6 mainhead">Time(hrs)</div>
+                                        <div class="col-sm-6 mainhead">Cost(KD)</div>
                                     </div>
                                 </div>
                             </div>
                             <hr />
                             <div ng-repeat="requestData in outputData.serviceRequestVehicles">
                                 <div class="row mainlist">
-                                    <div class="col-md-3">{{getSelectedVehType(requestData.vehicleTypeID).type}}</div>
-                                    <div class="col-md-4">
+                                    <div class="col-sm-3">{{getSelectedVehType(requestData.vehicleTypeID).type}}</div>
+                                    <div class="col-sm-4">
                                         <div ng-if="requestData.serviceTypeID != undefined && requestData.serviceTypeID != 0">{{getSelectedVehServiceType(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID).name}}</div>
                                     </div>
-                                    <div class="col-md-5">
+                                    <div class="col-sm-5">
                                         <div class="row">
-                                            <div class="col-md-6 mainlist">{{getSelectedVehServiceType(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID).duration/60}} hrs</div>
-                                            <div class="col-md-6 amountRight">{{getSelectedVehServiceType(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID).cost|currency:'':3}}</div>
+                                            <div class="col-sm-6 mainlist">{{getSelectedVehServiceType(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID).duration/60}} hrs</div>
+                                            <div class="col-sm-6 amountRight">{{getSelectedVehServiceType(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID).cost|currency:'':3}}</div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row sublist" ng-repeat="serviceAddonID in requestData.vehicleAddonIDs">
-                                    <div class="col-md-3"></div>
-                                    <div class="col-md-4">
+                                    <div class="col-sm-3"></div>
+                                    <div class="col-sm-4">
                                         {{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).name}}
                                     </div>
-                                    <div class="col-md-5">
+                                    <div class="col-sm-5">
                                         <div class="row">
-                                            <div class="col-md-6 sublist">{{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).duration}} mins</div>
-                                            <div class="col-md-6 amountRight">{{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).cost|currency:'':3}}</div>
+                                            <div class="col-sm-6 sublist">{{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).duration}} mins</div>
+                                            <div class="col-sm-6 amountRight">{{getSelectedVehServiceAddon(requestData.vehicleTypeID, requestData.vehicleClassID,requestData.serviceTypeID, serviceAddonID).cost|currency:'':3}}</div>
                                         </div>
                                     </div>
                                 </div>
                                 <hr />
                             </div>
                             <div class="row mainhead">
-                                <div class="col-md-7">Total  : </div>
-                                <div class="col-md-5">
+                                <div class="col-md-7 col-sm-7">Total  : </div>
+                                <div class="col-md-5 col-sm-5">
                                     <div class="row">
-                                        <div class="col-md-6 mainhead">{{calculateTotalDuration(true)}} hrs</div>
-                                        <div class="col-md-6 amountRight">{{calculateTotalCost()|currency:'':3}}</div>
+                                        <div class="col-md-6 col-sm-6 mainhead">{{calculateTotalDuration(true)}} hrs</div>
+                                        <div class="col-md-6 col-sm-6 amountRight">{{calculateTotalCost()|currency:'':3}}</div>
                                     </div>
                                 </div>
                             </div>
                             <div class="row sublist">
-                                <div class="col-md-12">30 mins included for the service personal to arrive at the location</div>
+                                <div class="col-md-12 col-sm-12">30 mins included for the service personal to arrive at the location</div>
                             </div>
                         </div>
                     </div>

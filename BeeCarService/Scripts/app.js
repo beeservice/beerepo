@@ -264,7 +264,7 @@
                 allDaySlot: false,
                 selectable: true,
                 selectHelper: true,
-                businessHours: { start: '9:00', end: '18:00', dow: [1, 2, 3, 4, 5] },
+                businessHours: { start: '9:00', end: '18:00', dow: [0, 1, 2, 3, 4, 5, 6] },
                 minTime: "09:00:00",
                 maxTime: "18:00:00",
                 eventDurationEditable: false,
@@ -502,11 +502,19 @@
         $scope.selectedServiceID = 0;
         $scope.selectedServiceData = {};
         $scope.masterList = {};
-        $scope.selVehTypeID = 1;
-        $scope.selVehClassID = 1;
         $scope.newMasterDataParentID = 0;
         $scope.newMasterDataPath = '';
         $scope.newMasterDataType = -1;
+        $scope.newType = '';
+        $scope.newClass = '';
+        $scope.newSTypeName = '';
+        $scope.newSTypeDuration = '';
+        $scope.newSTypeCost = '';
+        $scope.newAddOnName = '';
+        $scope.newAddOnDuration = '';
+        $scope.newAddOnCost = '';
+        $scope.newServiceTeamName = '';
+        $scope.newLandmark = '';
         $scope.selServiceTypeID = 1;
         $scope.selectedServices = [];
         $scope.criteria = {};
@@ -653,8 +661,24 @@
         $scope.addMasterData = function (masterType, strData) {
             $http.post("/Service/AddMasterData", { MasterType: masterType, ParentID: $scope.newMasterDataParentID, MasterData: strData });
             $scope.loadMasterList();
+            $scope.resetAddMasterData();
+        };
+
+        $scope.resetAddMasterData = function () {
+            $scope.newType = '';
+            $scope.newClass = '';
+            $scope.newSTypeName = '';
+            $scope.newSTypeDuration = '';
+            $scope.newSTypeCost = '';
+            $scope.newAddOnName = '';
+            $scope.newAddOnDuration = '';
+            $scope.newAddOnCost = '';
+            $scope.newServiceTeamName = '';
+            $scope.newLandmark = '';
             $scope.newMasterDataType = -1;
         };
+
+
 
         $scope.cancelServiceRequest = function (serviceRequestId) {
             bootbox.confirm("Are you sure to cancel the service request?", function (result) {

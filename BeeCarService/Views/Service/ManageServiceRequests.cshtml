@@ -66,37 +66,37 @@
                             <div class="panel panel-primary main-panel">
                                 <div class="panel-heading">
                                     <div class="row">
-                                        <div class="col-md-1"></div>
-                                        <div class="col-md-1">SR#</div>
-                                        <div class="col-md-1">Name</div>
-                                        <div class="col-md-2">Appt. Time</div>
-                                        <div class="col-md-1">Phone</div>
-                                        <div class="col-md-1">Vehicles</div>
-                                        <div class="col-md-1">Team #</div>
-                                        <div class="col-md-1">Status</div>
-                                        <div class="col-md-1">Cost(KD)</div>
-                                        <div class="col-md-2">Actions</div>
+                                        <div class="col-sm-1"></div>
+                                        <div class="col-sm-1">SR#</div>
+                                        <div class="col-sm-1">Name</div>
+                                        <div class="col-sm-2">Appt. Time</div>
+                                        <div class="col-sm-1">Phone</div>
+                                        <div class="col-sm-1">Vehicles</div>
+                                        <div class="col-sm-1">Team #</div>
+                                        <div class="col-sm-1">Status</div>
+                                        <div class="col-sm-1">Cost(KD)</div>
+                                        <div class="col-sm-2">Actions</div>
                                     </div>
                                 </div>
 
                                 <div class="panel-body" style="padding-top:0px">
                                     <div class="row" ng-hide="existingServiceRequests.length > 1">
-                                        <div class="col-md-1"></div>
-                                        <div class="col-md-11">No Service Requests Found</div>
+                                        <div class="col-sm-1"></div>
+                                        <div class="col-sm-11">No Service Requests Found</div>
                                     </div>
                                     <div class="row" ng-repeat="serviceRequest in existingServiceRequests">
-                                        <div class="col-md-1">
+                                        <div class="col-sm-1">
                                             <input type="checkbox" name="selServReq_{{serviceRequest.id}}" value={{serviceRequest.id}} ng-checked="{{selectedServices.indexOf(serviceRequest.id) > -1}}" ng-click="toggleServiceRequestSelection(serviceRequest.id)">
                                         </div>
-                                        <div class="col-md-1">SReq-{{serviceRequest.id}}</div>
-                                        <div class="col-md-1">{{serviceRequest.customerName}}</div>
-                                        <div class="col-md-2">{{serviceRequest.formattedStartTime}}</div>
-                                        <div class="col-md-1">{{serviceRequest.customerPhone}}</div>
-                                        <div class="col-md-1">{{serviceRequest.vehicleCount}}</div>
-                                        <div class="col-md-1">{{serviceRequest.serviceTeamId}}</div>
-                                        <div class="col-md-1">{{statusList[serviceRequest.status]}}</div>
-                                        <div class="col-md-1">{{serviceRequest.cost|currency:'':3}}</div>
-                                        <div class="col-md-2">
+                                        <div class="col-sm-1">SReq-{{serviceRequest.id}}</div>
+                                        <div class="col-sm-1">{{serviceRequest.customerName}}</div>
+                                        <div class="col-sm-2">{{serviceRequest.formattedStartTime}}</div>
+                                        <div class="col-sm-1">{{serviceRequest.customerPhone}}</div>
+                                        <div class="col-sm-1">{{serviceRequest.vehicleCount}}</div>
+                                        <div class="col-sm-1">{{serviceRequest.serviceTeamId}}</div>
+                                        <div class="col-sm-1">{{statusList[serviceRequest.status]}}</div>
+                                        <div class="col-sm-1">{{serviceRequest.cost|currency:'':3}}</div>
+                                        <div class="col-sm-2">
                                             <div>
                                                 <button ng-disabled="serviceRequest.status>0" name="cancelServiceRequest_{{serviceRequest.id}}" ng-click="cancelServiceRequest(serviceRequest.id)" class="btn btn-primary btn-sm" title="Cancel service request"><i class="glyphicon glyphicon-remove" style="color:red"></i></button>
                                                 <button ng-disabled="serviceRequest.status>0" name="start1ServiceRequest_{{serviceRequest.id}}" ng-click="updateServiceRequestStatus(serviceRequest.id, 1)" class="btn btn-primary btn-sm" title="Start service request"><i class="glyphicon glyphicon-play" style="color:green"></i></button>
@@ -147,38 +147,38 @@
                                 </div>
                                 <div class="panel-body">
                                     <div class="row mainhead">
-                                        <div class="col-md-3">Vehicle</div>
-                                        <div class="col-md-4">Service</div>
-                                        <div class="col-md-5">
+                                        <div class="col-sm-3">Vehicle</div>
+                                        <div class="col-sm-4">Service</div>
+                                        <div class="col-sm-5">
                                             <div class="row">
-                                                <div class="col-md-6 mainhead">Time(hrs)</div>
-                                                <div class="col-md-6 mainhead">Cost(KD)</div>
+                                                <div class="col-sm-6 mainhead">Time(hrs)</div>
+                                                <div class="col-sm-6 mainhead">Cost(KD)</div>
                                             </div>
                                         </div>
                                     </div>
                                     <hr />
                                     <div ng-repeat="requestData in selectedServiceData.serviceRequestVehicles">
                                         <div class="row mainlist">
-                                            <div class="col-md-3">{{getSRObject(masterList.vehicleTypes, requestData.vehicleTypeID).type}}</div>
-                                            <div class="col-md-4">
+                                            <div class="col-sm-3">{{getSRObject(masterList.vehicleTypes, requestData.vehicleTypeID).type}}</div>
+                                            <div class="col-sm-4">
                                                 <div>{{getSRObject(masterList.serviceTypes, requestData.serviceTypeID).name}}</div>
                                             </div>
-                                            <div class="col-md-5">
+                                            <div class="col-sm-5">
                                                 <div class="row">
-                                                    <div class="col-md-6 mainlist">{{getSRObject(masterList.serviceTypes, requestData.serviceTypeID).duration/60}} hrs</div>
-                                                    <div class="col-md-6 amountRight">{{getSRObject(masterList.serviceTypes, requestData.serviceTypeID).cost|currency:'':3}}</div>
+                                                    <div class="col-sm-6 mainlist">{{getSRObject(masterList.serviceTypes, requestData.serviceTypeID).duration/60}} hrs</div>
+                                                    <div class="col-sm-6 amountRight">{{getSRObject(masterList.serviceTypes, requestData.serviceTypeID).cost|currency:'':3}}</div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="row sublist" ng-repeat="serviceAddonID in requestData.vehicleAddonIDs">
-                                            <div class="col-md-3"></div>
-                                            <div class="col-md-4">
+                                            <div class="col-sm-3"></div>
+                                            <div class="col-sm-4">
                                                 {{getSRObject(masterList.addOns, serviceAddonID).name}}
                                             </div>
-                                            <div class="col-md-5">
+                                            <div class="col-sm-5">
                                                 <div class="row">
-                                                    <div class="col-md-6 sublist">{{getSRObject(masterList.addOns, serviceAddonID).duration}} mins</div>
-                                                    <div class="col-md-6 amountRight">{{getSRObject(masterList.addOns, serviceAddonID).cost|currency:'':3}}</div>
+                                                    <div class="col-sm-6 sublist">{{getSRObject(masterList.addOns, serviceAddonID).duration}} mins</div>
+                                                    <div class="col-sm-6 amountRight">{{getSRObject(masterList.addOns, serviceAddonID).cost|currency:'':3}}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -186,11 +186,11 @@
                                     </div>
 
                                     <div class="row mainhead">
-                                        <div class="col-md-7">Total  : </div>
-                                        <div class="col-md-5">
+                                        <div class="col-sm-7">Total  : </div>
+                                        <div class="col-sm-5">
                                             <div class="row">
-                                                <div class="col-md-6 mainhead">{{selectedServiceData.serviceDuration}}{{convertDuration(selectedServiceData.serviceDuration)}} hrs</div>
-                                                <div class="col-md-6 amountRight">{{selectedServiceData.cost|currency:'':3}}</div>
+                                                <div class="col-sm-6 mainhead">{{selectedServiceData.serviceDuration}}{{convertDuration(selectedServiceData.serviceDuration)}} hrs</div>
+                                                <div class="col-sm-6 amountRight">{{selectedServiceData.cost|currency:'':3}}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -245,59 +245,59 @@
                             <div class="panel panel-primary main-panel">
                                 <div class="panel-heading">
                                     <div class="row">
-                                        <div class="col-md-8">Vehicle Master</div>
-                                        <div class="col-md-4">New Master Data</div>
+                                        <div class="col-sm-8">Vehicle Master</div>
+                                        <div class="col-sm-4">New Master Data</div>
                                     </div>
                                 </div>
 
                                 <div class="panel-body" style="padding-top:0px">
 
                                     <div class="row tab-content">
-                                        <div class="col-md-8">
+                                        <div class="col-sm-8">
                                             <div>
                                                 <a href="#" role="tab" ng-click="newMasterDataType=0;newMasterDataPath='';newMasterDataParentID=0;">New Vehicle</a>
                                             </div>
                                             <div class="row" ng-repeat="vType in masterList.vehicleTypes">
-                                                <div class="col-md-12">
+                                                <div class="col-sm-12">
                                                     <div class="row">
-                                                        <div class="col-md-2">
+                                                        <div class="col-sm-2">
                                                             {{vType.type}}
                                                             <button ng-show="vType.status==0" type="button" class="btn btn-xs" ng-click="enableMasterData(0,vType.id,1)" title="Disable"><i class="glyphicon glyphicon-remove" style="color:red"></i></button>
                                                             <button ng-show="vType.status==1" type="button" class="btn btn-xs" ng-click="enableMasterData(0,vType.id,0)" title="Enable"><i class="glyphicon glyphicon-plus" style="color:darkblue"></i></button>
                                                         </div>
-                                                        <div class="col-md-10">
+                                                        <div class="col-sm-10">
                                                             <a href="#" role="tab" ng-click="$parent.newMasterDataType=1;$parent.newMasterDataPath=vType.type + '-> ' ;$parent.newMasterDataParentID=vType.id;">New Type</a>
                                                         </div>
                                                     </div>
                                                     <div class="row" ng-repeat="vClass in masterList.vehicleClasses | filter: {vehichleTypeID: vType.id}">
-                                                        <div class="col-md-12">
+                                                        <div class="col-sm-12">
                                                             <div class="row">
-                                                                <div class="col-md-1"></div>
-                                                                <div class="col-md-2">
+                                                                <div class="col-sm-1"></div>
+                                                                <div class="col-sm-2">
                                                                     {{vClass.name}}
                                                                     <button ng-show="vClass.status==0" type="button" class="btn btn-xs" ng-click="enableMasterData(1,vClass.id,1)" title="Disable"><i class="glyphicon glyphicon-remove" style="color:red"></i></button>
                                                                     <button ng-show="vClass.status==1" type="button" class="btn btn-xs" ng-click="enableMasterData(1,vClass.id,0)" title="Enable"><i class="glyphicon glyphicon-plus" style="color:darkblue"></i></button>
                                                                 </div>
-                                                                <div class="col-md-9">
+                                                                <div class="col-sm-9">
                                                                     <a href="#" role="tab" ng-click="$parent.$parent.newMasterDataType=2;$parent.$parent.newMasterDataPath=vType.type + '->' + vClass.name + '-> ';$parent.$parent.newMasterDataParentID=vClass.id;">New Service Type</a>
                                                                 </div>
                                                             </div>
                                                             <div class="row" ng-repeat="vServiceType in masterList.serviceTypes | filter: {vehicleClassID: vClass.id}">
-                                                                <div class="col-md-12">
+                                                                <div class="col-sm-12">
                                                                     <div class="row">
-                                                                        <div class="col-md-3"></div>
-                                                                        <div class="col-md-2">
+                                                                        <div class="col-sm-3"></div>
+                                                                        <div class="col-sm-2">
                                                                             {{vServiceType.name}}
                                                                             <button ng-show="vServiceType.status==0" type="button" class="btn btn-xs" ng-click="enableMasterData(2,vServiceType.id,1)" title="Disable"><i class="glyphicon glyphicon-remove" style="color:red"></i></button>
                                                                             <button ng-show="vServiceType.status==1" type="button" class="btn btn-xs" ng-click="enableMasterData(2,vServiceType.id,0)" title="Enable"><i class="glyphicon glyphicon-plus" style="color:darkblue"></i></button>
                                                                         </div>
-                                                                        <div class="col-md-7">
+                                                                        <div class="col-sm-7">
                                                                             <a href="#" ng-click="$parent.$parent.$parent.newMasterDataType=3;$parent.$parent.$parent.newMasterDataPath=vType.type + '->' + vClass.name + '-> ' + vServiceType.name + '-> ';$parent.$parent.$parent.newMasterDataParentID=vServiceType.id">New Addon</a>
                                                                         </div>
                                                                     </div>
                                                                     <div class="row" ng-repeat="vAddOn in masterList.addOns | filter: {serviceTypeID: vServiceType.id}">
-                                                                        <div class="col-md-5"></div>
-                                                                        <div class="col-md-7">
+                                                                        <div class="col-sm-5"></div>
+                                                                        <div class="col-sm-7">
                                                                             {{vAddOn.name}}
                                                                             <button ng-show="vAddOn.status==0" type="button" class="btn btn-xs" ng-click="enableMasterData(3,vAddOn.id,1)" title="Disable"><i class="glyphicon glyphicon-remove" style="color:red"></i></button>
                                                                             <button ng-show="vAddOn.status==1" type="button" class="btn btn-xs" ng-click="enableMasterData(3,vAddOn.id,0)" title="Enable"><i class="glyphicon glyphicon-plus" style="color:darkblue"></i></button>
@@ -310,9 +310,41 @@
                                                 </div>
                                             </div>
                                             <hr />
+                                            <div class="col-sm-12">
+                                                <p class="mainhead">Service Teams</p>
+                                            </div>
+                                            <div class="row" ng-repeat="serTeam in masterList.serviceTeams">
+                                                <div class="col-sm-12">
+                                                    {{serTeam.name}}
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <a class="btn-primary" ng-click="newMasterDataType=4;newMasterDataPath='';">New Service Team</a>
+                                                <div class="row" ng-show="newMasterDataType==4">
+                                                    <H4>New Service Team</H4>
+                                                    <label>Service Team Name</label><input ng-model="newServiceTeamName" size="10" maxlength="20" /><br />
+                                                    <button name="btnAddSTeam" ng-click="addMasterData(4,'{&quot;name&quot;:&quot;' + newServiceTeamName + '&quot;}')" class="btn btn-primary btn-sm" title="Save Service Team">Add</button>
+                                                </div>
+                                            </div>
                                             <hr />
+                                            <div class="col-sm-12">
+                                                <p class="mainhead">Landmarks</p>
+                                            </div>
+                                            <div class="row" ng-repeat="landmark in masterList.landmarks">
+                                                <div class="col-sm-12">
+                                                    {{landmark.name}}
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <a class="btn-primary" ng-click="newMasterDataType=5;newMasterDataPath='';">New Landmark</a>
+                                                <div class="row" ng-show="newMasterDataType==5">
+                                                    <H4>New Landmark</H4>
+                                                    <label>Landmark Desc</label><input ng-model="newLandmark" size="10" maxlength="40" /><br />
+                                                    <button name="btnAddLandmark" ng-click="addMasterData(5,'{&quot;name&quot;:&quot;' + newLandmark + '&quot;}')" class="btn btn-primary btn-sm" title="Save New Addon">Add</button>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-sm-4">
                                             <div class="row" ng-show="newMasterDataType==0">
                                                 <H4>New Vehicle</H4>
                                                 <label>Vehicle: </label><input ng-model="newType" size="10" maxlength="20" /><br />
